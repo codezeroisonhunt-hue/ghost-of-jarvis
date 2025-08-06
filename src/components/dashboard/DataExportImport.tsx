@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Download, Upload, Database, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/components/ui/sonner';
+import { toast } from '@/hooks/use-toast';
 
 const DataExportImport: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
@@ -45,13 +45,15 @@ const DataExportImport: React.FC = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      toast("Data Exported Successfully", {
+      toast({
+        title: "Data Exported Successfully",
         description: "Your Jarvis data has been exported to a JSON file.",
         duration: 4000
       });
     } catch (error) {
       console.error('Export error:', error);
-      toast("Export Failed", {
+      toast({
+        title: "Export Failed",
         description: "Could not export data. Please try again.",
         variant: "destructive"
       });
@@ -96,7 +98,8 @@ const DataExportImport: React.FC = () => {
             if (data.settings.sleepMode) localStorage.setItem('jarvis-sleep-mode', data.settings.sleepMode);
           }
 
-          toast("Data Imported Successfully", {
+          toast({
+            title: "Data Imported Successfully",
             description: `Imported data from ${new Date(importedData.exportDate).toLocaleDateString()}. Please refresh the page.`,
             duration: 6000
           });
@@ -108,7 +111,8 @@ const DataExportImport: React.FC = () => {
         }
       } catch (error) {
         console.error('Import error:', error);
-        toast("Import Failed", {
+        toast({
+          title: "Import Failed",
           description: "Invalid file format or corrupted data.",
           variant: "destructive"
         });
