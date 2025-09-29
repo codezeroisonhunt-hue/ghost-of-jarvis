@@ -58,11 +58,6 @@ const FileManager: React.FC = () => {
 
       if (uploadError) throw uploadError;
 
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: `Uploaded file: ${file.name}` 
-      });
-
       toast.success('File uploaded successfully');
       fetchFiles();
     } catch (error) {
@@ -93,11 +88,6 @@ const FileManager: React.FC = () => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: `Downloaded file: ${fileName}` 
-      });
-
       toast.success('File downloaded successfully');
     } catch (error) {
       console.error('Error downloading file:', error);
@@ -112,11 +102,6 @@ const FileManager: React.FC = () => {
         .remove([`${user?.id}/${fileName}`]);
 
       if (error) throw error;
-
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: `Deleted file: ${fileName}` 
-      });
 
       toast.success('File deleted successfully');
       fetchFiles();

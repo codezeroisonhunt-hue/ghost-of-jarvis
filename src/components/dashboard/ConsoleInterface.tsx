@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 interface ConsoleLog {
   id: string;
   command: string;
-  timestamp: string;
+  created_at: string;
 }
 
 const ConsoleInterface: React.FC = () => {
@@ -33,10 +33,10 @@ const ConsoleInterface: React.FC = () => {
   const fetchConsoleLogs = async () => {
     try {
       const { data, error } = await supabase
-        .from('console_logs')
+        .from('commands')
         .select('*')
         .eq('user_id', user?.id)
-        .order('timestamp', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
@@ -114,7 +114,7 @@ Type "help" for available commands.`;
 
       // Save to database
       const { error } = await supabase
-        .from('console_logs')
+        .from('commands')
         .insert([
           {
             user_id: user.id,
@@ -123,11 +123,6 @@ Type "help" for available commands.`;
         ]);
 
       if (error) throw error;
-
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: `Executed console command: ${command}` 
-      });
 
       setCurrentCommand('');
       fetchConsoleLogs();
@@ -144,8 +139,8 @@ Type "help" for available commands.`;
     outputRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString();
+  const formatTime = (created_at: string) => {
+    return new Date(created_at).toLocaleString();
   };
 
   return (
@@ -219,7 +214,7 @@ Type "help" for available commands.`;
                   >
                     <p className="text-white font-mono text-sm">{log.command}</p>
                     <p className="text-xs text-gray-400 mt-1">
-                      {formatTime(log.timestamp)}
+                      {formatTime(log.created_at)}
                     </p>
                   </div>
                 ))}

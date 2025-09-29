@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 interface Message {
   id: string;
   user_id: string;
-  message: string;
+  content: string;
   timestamp: string;
 }
 
@@ -34,7 +34,7 @@ const ChatInterface: React.FC = () => {
   const fetchMessages = async () => {
     try {
       const { data, error } = await supabase
-        .from('messages')
+        .from('chat_messages')
         .select('*')
         .order('timestamp', { ascending: true });
 
@@ -54,7 +54,7 @@ const ChatInterface: React.FC = () => {
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'messages'
+          table: 'chat_messages'
         },
         (payload) => {
           setMessages(current => [...current, payload.new as Message]);
@@ -75,20 +75,17 @@ const ChatInterface: React.FC = () => {
 
     try {
       const { error } = await supabase
-        .from('messages')
+        .from('chat_messages')
         .insert([
           {
             user_id: user.id,
-            message: newMessage.trim()
+            content: newMessage.trim(),
+            role: 'user',
+            session_id: crypto.randomUUID()
           }
         ]);
 
       if (error) throw error;
-
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: 'Sent a message in chat' 
-      });
 
       setNewMessage('');
     } catch (error) {
@@ -130,7 +127,7 @@ const ChatInterface: React.FC = () => {
                     : 'bg-gray-700 text-gray-100'
                 }`}
               >
-                <p className="text-sm">{message.message}</p>
+                <p className="text-sm">{message.content}</p>
                 <p className="text-xs opacity-75 mt-1">
                   {formatTime(message.timestamp)}
                 </p>

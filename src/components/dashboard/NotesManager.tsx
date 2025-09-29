@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 interface Note {
   id: string;
   content: string;
-  timestamp: string;
+  created_at: string;
 }
 
 const NotesManager: React.FC = () => {
@@ -32,7 +32,7 @@ const NotesManager: React.FC = () => {
         .from('notes')
         .select('*')
         .eq('user_id', user?.id)
-        .order('timestamp', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setNotes(data || []);
@@ -60,11 +60,6 @@ const NotesManager: React.FC = () => {
 
       if (error) throw error;
 
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: 'Created a new note' 
-      });
-
       setNewNote('');
       fetchNotes();
       toast.success('Note saved successfully');
@@ -88,11 +83,6 @@ const NotesManager: React.FC = () => {
 
       if (error) throw error;
 
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: 'Updated a note' 
-      });
-
       setEditingId(null);
       setEditingContent('');
       fetchNotes();
@@ -112,11 +102,6 @@ const NotesManager: React.FC = () => {
         .eq('user_id', user?.id);
 
       if (error) throw error;
-
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: 'Deleted a note' 
-      });
 
       fetchNotes();
       toast.success('Note deleted successfully');
@@ -207,7 +192,7 @@ const NotesManager: React.FC = () => {
                     <>
                       <div className="flex justify-between items-start mb-2">
                         <p className="text-gray-400 text-xs">
-                          {new Date(note.timestamp).toLocaleString()}
+                          {new Date(note.created_at).toLocaleString()}
                         </p>
                         <div className="flex space-x-2">
                           <Button
