@@ -1,9 +1,7 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import ApiKeyManager from "./ApiKeyManager";
-import { Alert, AlertDescription } from "./ui/alert";
-import { Check } from "lucide-react";
+import { Key } from "lucide-react";
 
 const JarvisSettings: React.FC = () => {
   return (
@@ -13,19 +11,23 @@ const JarvisSettings: React.FC = () => {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>API Keys</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Key className="h-5 w-5" />
+              API Keys
+            </CardTitle>
             <CardDescription>
               Configure API keys for JARVIS AI services
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Alert className="mb-4 bg-green-500/10 border-green-500/30">
-              <Check className="h-4 w-4 text-green-500" />
-              <AlertDescription>
-                Groq AI API key is pre-configured and ready to use.
-              </AlertDescription>
-            </Alert>
-            <ApiKeyManager serviceName="ElevenLabs" />
+          <CardContent className="space-y-4">
+            <div>
+              <h4 className="text-sm font-medium mb-2">Groq AI (Required for chat)</h4>
+              <ApiKeyManager serviceName="Groq" />
+            </div>
+            <div>
+              <h4 className="text-sm font-medium mb-2">ElevenLabs (Optional for voice)</h4>
+              <ApiKeyManager serviceName="ElevenLabs" />
+            </div>
           </CardContent>
         </Card>
       </div>
