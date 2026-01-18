@@ -4,14 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Mail, Calendar, Activity } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-
-interface Profile {
-  id: string;
-  email: string;
-  created_at: string;
-  updated_at: string;
-}
 
 interface ActivityLog {
   id: string;
@@ -19,44 +11,24 @@ interface ActivityLog {
   timestamp: string;
 }
 
+const ACTIVITY_STORAGE_KEY = 'jarvis_activity_logs';
+
 const ProfilePage: React.FC = () => {
   const { user, signOut } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
 
   useEffect(() => {
     if (user) {
-      fetchProfile();
       fetchActivityLogs();
     }
   }, [user]);
 
-  const fetchProfile = async () => {
+  const fetchActivityLogs = () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user?.id)
-        .single();
-
-      if (error) throw error;
-      setProfile(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
-
-  const fetchActivityLogs = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('activity_logs')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('timestamp', { ascending: false })
-        .limit(10);
-
-      if (error) throw error;
-      setActivityLogs(data || []);
+      const storedLogs = localStorage.getItem(ACTIVITY_STORAGE_KEY);
+      if (storedLogs) {
+        setActivityLogs(JSON.parse(storedLogs));
+      }
     } catch (error) {
       console.error('Error fetching activity logs:', error);
     }
@@ -100,15 +72,13 @@ const ProfilePage: React.FC = () => {
                 </div>
               </div>
               
-              {profile && (
-                <div className="flex items-center space-x-3">
-                  <Calendar className="h-5 w-5 text-blue-400" />
-                  <div>
-                    <p className="text-gray-400 text-sm">Member Since</p>
-                    <p className="text-white">{formatDate(profile.created_at)}</p>
-                  </div>
+              <div className="flex items-center space-x-3">
+                <Calendar className="h-5 w-5 text-blue-400" />
+                <div>
+                  <p className="text-gray-400 text-sm">Member Since</p>
+                  <p className="text-white">{user?.created_at ? formatDate(user.created_at) : 'N/A'}</p>
                 </div>
-              )}
+              </div>
             </div>
             
             <div className="space-y-4">

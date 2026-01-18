@@ -1,24 +1,17 @@
-
 /**
  * API Key Manager for JARVIS
  * 
  * This utility helps manage API keys across the application.
+ * API keys are stored securely in localStorage - never hardcoded.
  */
 
 // Define valid API service types
 export type ApiServiceType = 'groq' | 'elevenlabs';
 
-// Default Groq API key
-const DEFAULT_GROQ_KEY = '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';
-
 /**
  * Check if an API key exists for a service
  */
 export const apiKeyExists = async (service: ApiServiceType): Promise<boolean> => {
-  if (service.toLowerCase() === 'groq') {
-    // Always return true for Groq since we have a default key
-    return true;
-  }
   const key = localStorage.getItem(`${service.toLowerCase()}_api_key`);
   return !!key;
 };
@@ -34,11 +27,14 @@ export const setApiKey = async (service: ApiServiceType, value: string): Promise
  * Get an API key for a service
  */
 export const getApiKey = async (service: ApiServiceType): Promise<string | null> => {
-  if (service.toLowerCase() === 'groq') {
-    // Return the stored key or the default key if none is stored
-    return localStorage.getItem(`${service.toLowerCase()}_api_key`) || DEFAULT_GROQ_KEY;
-  }
   return localStorage.getItem(`${service.toLowerCase()}_api_key`);
+};
+
+/**
+ * Validate if a Groq API key format is correct
+ */
+export const validateGroqApiKey = (key: string): boolean => {
+  return key.startsWith('gsk_') && key.length > 20;
 };
 
 /**

@@ -1,6 +1,4 @@
 
-import { supabase } from '@/integrations/supabase/client';
-
 export interface Goal {
   id: string;
   user_id: string;
@@ -21,150 +19,147 @@ export interface Habit {
   created_at: string;
 }
 
+const GOALS_STORAGE_KEY = 'jarvis_goals';
+const HABITS_STORAGE_KEY = 'jarvis_habits';
+
+const getStoredGoals = (): Goal[] => {
+  try {
+    const stored = localStorage.getItem(GOALS_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveGoals = (goals: Goal[]) => {
+  localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goals));
+};
+
+const getStoredHabits = (): Habit[] => {
+  try {
+    const stored = localStorage.getItem(HABITS_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveHabits = (habits: Habit[]) => {
+  localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
+};
+
 export const goalService = {
   // Goal methods
   async createGoal(goal: Omit<Goal, 'id' | 'user_id' | 'created_at'>): Promise<Goal | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.error('No authenticated user');
-      return null;
-    }
-
-    const { data, error } = await supabase
-      .from('goals')
-      .insert({
+    try {
+      const newGoal: Goal = {
         ...goal,
-        user_id: user.id
-      })
-      .select()
-      .single();
-
-    if (error) {
+        id: Date.now().toString(),
+        user_id: 'local',
+        created_at: new Date().toISOString()
+      };
+      
+      const goals = getStoredGoals();
+      goals.push(newGoal);
+      saveGoals(goals);
+      return newGoal;
+    } catch (error) {
       console.error('Error creating goal:', error);
       return null;
     }
-    return data;
   },
 
   async getGoals(): Promise<Goal[]> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
-
-    const { data, error } = await supabase
-      .from('goals')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) {
+    try {
+      return getStoredGoals().sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    } catch (error) {
       console.error('Error fetching goals:', error);
       return [];
     }
-    return data || [];
   },
 
   async updateGoalProgress(id: string, progress: number): Promise<Goal | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
-
-    const { data, error } = await supabase
-      .from('goals')
-      .update({ progress })
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .select()
-      .single();
-
-    if (error) {
+    try {
+      const goals = getStoredGoals();
+      const index = goals.findIndex(g => g.id === id);
+      
+      if (index === -1) return null;
+      
+      goals[index].progress = progress;
+      saveGoals(goals);
+      return goals[index];
+    } catch (error) {
       console.error('Error updating goal progress:', error);
       return null;
     }
-    return data;
   },
 
   // Habit methods
   async createHabit(habitName: string): Promise<Habit | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.error('No authenticated user');
-      return null;
-    }
-
-    const { data, error } = await supabase
-      .from('habits')
-      .insert({ 
+    try {
+      const newHabit: Habit = {
+        id: Date.now().toString(),
+        user_id: 'local',
         habit_name: habitName,
-        user_id: user.id
-      })
-      .select()
-      .single();
-
-    if (error) {
+        streak_count: 0,
+        created_at: new Date().toISOString()
+      };
+      
+      const habits = getStoredHabits();
+      habits.push(newHabit);
+      saveHabits(habits);
+      return newHabit;
+    } catch (error) {
       console.error('Error creating habit:', error);
       return null;
     }
-    return data;
   },
 
   async getHabits(): Promise<Habit[]> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
-
-    const { data, error } = await supabase
-      .from('habits')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) {
+    try {
+      return getStoredHabits().sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    } catch (error) {
       console.error('Error fetching habits:', error);
       return [];
     }
-    return data || [];
   },
 
   async logHabit(id: string): Promise<Habit | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
-
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Get current habit to check streak
-    const { data: currentHabit } = await supabase
-      .from('habits')
-      .select('*')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .single();
-
-    if (!currentHabit) return null;
-
-    let newStreakCount = 1;
-    if (currentHabit.last_logged) {
-      const lastLogged = new Date(currentHabit.last_logged);
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
+    try {
+      const habits = getStoredHabits();
+      const index = habits.findIndex(h => h.id === id);
       
-      if (lastLogged.toDateString() === yesterday.toDateString()) {
-        newStreakCount = currentHabit.streak_count + 1;
+      if (index === -1) return null;
+      
+      const today = new Date().toISOString().split('T')[0];
+      const currentHabit = habits[index];
+      
+      let newStreakCount = 1;
+      if (currentHabit.last_logged) {
+        const lastLogged = new Date(currentHabit.last_logged);
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        if (lastLogged.toDateString() === yesterday.toDateString()) {
+          newStreakCount = currentHabit.streak_count + 1;
+        }
       }
-    }
-
-    const { data, error } = await supabase
-      .from('habits')
-      .update({ 
+      
+      habits[index] = {
+        ...currentHabit,
         last_logged: today,
         streak_count: newStreakCount
-      })
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .select()
-      .single();
-
-    if (error) {
+      };
+      
+      saveHabits(habits);
+      return habits[index];
+    } catch (error) {
       console.error('Error logging habit:', error);
       return null;
     }
-    return data;
   }
 };
