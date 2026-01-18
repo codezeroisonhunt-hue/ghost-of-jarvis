@@ -7,139 +7,14 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
-      chat_messages: {
-        Row: {
-          content: string
-          id: string
-          role: string
-          session_id: string
-          timestamp: string
-          user_id: string
-        }
-        Insert: {
-          content: string
-          id?: string
-          role: string
-          session_id: string
-          timestamp?: string
-          user_id: string
-        }
-        Update: {
-          content?: string
-          id?: string
-          role?: string
-          session_id?: string
-          timestamp?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      commands: {
-        Row: {
-          command: string
-          created_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          command: string
-          created_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          command?: string
-          created_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      files: {
-        Row: {
-          created_at: string
-          id: string
-          name: string
-          path: string
-          size: number | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          name: string
-          path: string
-          size?: number | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          name?: string
-          path?: string
-          size?: number | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      notes: {
-        Row: {
-          content: string
-          created_at: string
-          id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string
-          display_name: string | null
-          id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          display_name?: string | null
-          id?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string
-          display_name?: string | null
-          id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
