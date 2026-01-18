@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Send } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface Message {
@@ -14,6 +13,8 @@ interface Message {
   content: string;
   timestamp: string;
 }
+
+const CHAT_STORAGE_KEY = 'jarvis_dashboard_messages';
 
 const ChatInterface: React.FC = () => {
   const { user } = useAuth();
@@ -24,47 +25,30 @@ const ChatInterface: React.FC = () => {
 
   useEffect(() => {
     fetchMessages();
-    subscribeToMessages();
   }, []);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const fetchMessages = async () => {
+  const fetchMessages = () => {
     try {
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .order('timestamp', { ascending: true });
-
-      if (error) throw error;
-      setMessages(data || []);
+      const storedMessages = localStorage.getItem(CHAT_STORAGE_KEY);
+      if (storedMessages) {
+        setMessages(JSON.parse(storedMessages));
+      }
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast.error('Failed to load messages');
     }
   };
 
-  const subscribeToMessages = () => {
-    const channel = supabase
-      .channel('messages-channel')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'chat_messages'
-        },
-        (payload) => {
-          setMessages(current => [...current, payload.new as Message]);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+  const saveMessages = (newMessages: Message[]) => {
+    try {
+      localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(newMessages.slice(-100)));
+    } catch (error) {
+      console.error('Error saving messages:', error);
+    }
   };
 
   const sendMessage = async (e: React.FormEvent) => {
@@ -74,19 +58,16 @@ const ChatInterface: React.FC = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('chat_messages')
-        .insert([
-          {
-            user_id: user.id,
-            content: newMessage.trim(),
-            role: 'user',
-            session_id: crypto.randomUUID()
-          }
-        ]);
+      const newMsg: Message = {
+        id: Date.now().toString(),
+        user_id: user.id,
+        content: newMessage.trim(),
+        timestamp: new Date().toISOString()
+      };
 
-      if (error) throw error;
-
+      const updatedMessages = [...messages, newMsg];
+      setMessages(updatedMessages);
+      saveMessages(updatedMessages);
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);

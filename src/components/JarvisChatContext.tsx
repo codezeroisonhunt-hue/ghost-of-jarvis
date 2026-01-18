@@ -5,7 +5,6 @@ import { generateAssistantResponse, synthesizeSpeech } from "@/services/aiAssist
 import { getVoiceId } from "@/utils/apiKeyManager";
 import { processSkillCommand, isSkillCommand } from "@/services/skillsService";
 import { saveToHistory } from "@/services/chatHistoryService";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "./ui/use-toast";
 
@@ -35,6 +34,8 @@ interface JarvisChatContextType {
 
 const JarvisChatContext = createContext<JarvisChatContextType | undefined>(undefined);
 
+const CHAT_STORAGE_KEY = 'jarvis_chat_messages';
+
 export const JarvisChatProvider: React.FC<React.PropsWithChildren<JarvisChatProps>> = ({
   children,
   activeMode,
@@ -56,47 +57,35 @@ export const JarvisChatProvider: React.FC<React.PropsWithChildren<JarvisChatProp
   const [isImageOpen, setIsImageOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [sessionId] = useState(() => crypto.randomUUID());
 
   // Load chat history when component mounts
   useEffect(() => {
-    if (user) {
-      loadChatHistory();
-    }
+    loadChatHistory();
   }, [user]);
 
   const loadChatHistory = async () => {
-    if (!user) return;
-
     try {
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('timestamp', { ascending: true })
-        .limit(50);
-
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        const loadedMessages: Message[] = data.map((msg) => ({
-          id: msg.id,
-          content: msg.content,
-          role: msg.role as 'user' | 'assistant',
-          timestamp: new Date(msg.timestamp),
-        }));
-        setMessages(loadedMessages);
-      } else {
-        // Initialize with welcome message if no history
-        setMessages([
-          {
-            id: "welcome-message",
-            content: "Hello! I'm JARVIS, your AI assistant. How can I help you today?",
-            role: "assistant",
-            timestamp: new Date(),
-          },
-        ]);
+      const storedMessages = localStorage.getItem(CHAT_STORAGE_KEY);
+      if (storedMessages) {
+        const parsedMessages = JSON.parse(storedMessages);
+        if (parsedMessages.length > 0) {
+          setMessages(parsedMessages.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          })));
+          return;
+        }
       }
+      
+      // Initialize with welcome message if no history
+      setMessages([
+        {
+          id: "welcome-message",
+          content: "Hello! I'm JARVIS, your AI assistant. How can I help you today?",
+          role: "assistant",
+          timestamp: new Date(),
+        },
+      ]);
     } catch (error) {
       console.error('Error loading chat history:', error);
       // Initialize with welcome message on error
@@ -111,24 +100,11 @@ export const JarvisChatProvider: React.FC<React.PropsWithChildren<JarvisChatProp
     }
   };
 
-  const saveChatMessage = async (message: Message) => {
-    if (!user) return;
-
+  const saveChatMessages = (messagesToSave: Message[]) => {
     try {
-      const { error } = await supabase
-        .from('chat_messages')
-        .insert([
-          {
-            user_id: user.id,
-            content: message.content,
-            role: message.role,
-            session_id: sessionId,
-          }
-        ]);
-
-      if (error) throw error;
+      localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messagesToSave.slice(-50)));
     } catch (error) {
-      console.error('Error saving chat message:', error);
+      console.error('Error saving chat messages:', error);
     }
   };
 
@@ -221,10 +197,8 @@ export const JarvisChatProvider: React.FC<React.PropsWithChildren<JarvisChatProp
       timestamp: new Date(),
     };
 
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-    
-    // Save user message to Supabase
-    await saveChatMessage(newMessage);
+    const updatedMessagesWithUser = [...messages, newMessage];
+    setMessages(updatedMessagesWithUser);
 
     try {
       let response: Message;
@@ -283,14 +257,14 @@ export const JarvisChatProvider: React.FC<React.PropsWithChildren<JarvisChatProp
         }
       }
 
-      const updatedMessages = [...messages, newMessage, response];
-      setMessages(updatedMessages);
+      const finalMessages = [...updatedMessagesWithUser, response];
+      setMessages(finalMessages);
       
-      // Save assistant response to Supabase
-      await saveChatMessage(response);
+      // Save to localStorage
+      saveChatMessages(finalMessages);
       
       // Save conversation to history
-      saveToHistory(updatedMessages);
+      saveToHistory(finalMessages);
       
       // Set new suggestions if provided
       if (messageSuggestions && messageSuggestions.length > 0) {

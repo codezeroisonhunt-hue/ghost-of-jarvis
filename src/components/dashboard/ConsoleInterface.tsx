@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Terminal, Send } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface ConsoleLog {
@@ -13,6 +12,8 @@ interface ConsoleLog {
   command: string;
   created_at: string;
 }
+
+const CONSOLE_STORAGE_KEY = 'jarvis_console_logs';
 
 const ConsoleInterface: React.FC = () => {
   const { user } = useAuth();
@@ -30,20 +31,23 @@ const ConsoleInterface: React.FC = () => {
     scrollToBottom();
   }, [output]);
 
-  const fetchConsoleLogs = async () => {
+  const fetchConsoleLogs = () => {
     try {
-      const { data, error } = await supabase
-        .from('commands')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      setLogs(data || []);
+      const storedLogs = localStorage.getItem(CONSOLE_STORAGE_KEY);
+      if (storedLogs) {
+        setLogs(JSON.parse(storedLogs));
+      }
     } catch (error) {
       console.error('Error fetching console logs:', error);
       toast.error('Failed to load console history');
+    }
+  };
+
+  const saveLogs = (newLogs: ConsoleLog[]) => {
+    try {
+      localStorage.setItem(CONSOLE_STORAGE_KEY, JSON.stringify(newLogs.slice(-50)));
+    } catch (error) {
+      console.error('Error saving logs:', error);
     }
   };
 
@@ -112,20 +116,17 @@ Type "help" for available commands.`;
         setOutput(prev => [...prev, result]);
       }
 
-      // Save to database
-      const { error } = await supabase
-        .from('commands')
-        .insert([
-          {
-            user_id: user.id,
-            command: command
-          }
-        ]);
-
-      if (error) throw error;
+      // Save to localStorage
+      const newLog: ConsoleLog = {
+        id: Date.now().toString(),
+        command: command,
+        created_at: new Date().toISOString()
+      };
+      const updatedLogs = [newLog, ...logs];
+      setLogs(updatedLogs);
+      saveLogs(updatedLogs);
 
       setCurrentCommand('');
-      fetchConsoleLogs();
     } catch (error) {
       console.error('Error executing command:', error);
       setOutput(prev => [...prev, 'Error: Failed to execute command']);

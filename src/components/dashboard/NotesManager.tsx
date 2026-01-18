@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Save, Trash2, Edit } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface Note {
@@ -13,6 +12,8 @@ interface Note {
   content: string;
   created_at: string;
 }
+
+const NOTES_STORAGE_KEY = 'jarvis_notes';
 
 const NotesManager: React.FC = () => {
   const { user } = useAuth();
@@ -26,19 +27,23 @@ const NotesManager: React.FC = () => {
     fetchNotes();
   }, []);
 
-  const fetchNotes = async () => {
+  const fetchNotes = () => {
     try {
-      const { data, error } = await supabase
-        .from('notes')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setNotes(data || []);
+      const storedNotes = localStorage.getItem(NOTES_STORAGE_KEY);
+      if (storedNotes) {
+        setNotes(JSON.parse(storedNotes));
+      }
     } catch (error) {
       console.error('Error fetching notes:', error);
       toast.error('Failed to load notes');
+    }
+  };
+
+  const saveNotesToStorage = (notesToSave: Note[]) => {
+    try {
+      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesToSave));
+    } catch (error) {
+      console.error('Error saving notes:', error);
     }
   };
 
@@ -49,19 +54,16 @@ const NotesManager: React.FC = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('notes')
-        .insert([
-          {
-            user_id: user.id,
-            content: newNote.trim()
-          }
-        ]);
+      const newNoteObj: Note = {
+        id: Date.now().toString(),
+        content: newNote.trim(),
+        created_at: new Date().toISOString()
+      };
 
-      if (error) throw error;
-
+      const updatedNotes = [newNoteObj, ...notes];
+      setNotes(updatedNotes);
+      saveNotesToStorage(updatedNotes);
       setNewNote('');
-      fetchNotes();
       toast.success('Note saved successfully');
     } catch (error) {
       console.error('Error saving note:', error);
@@ -75,17 +77,13 @@ const NotesManager: React.FC = () => {
     if (!editingContent.trim() || !user) return;
 
     try {
-      const { error } = await supabase
-        .from('notes')
-        .update({ content: editingContent.trim() })
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
+      const updatedNotes = notes.map(note => 
+        note.id === id ? { ...note, content: editingContent.trim() } : note
+      );
+      setNotes(updatedNotes);
+      saveNotesToStorage(updatedNotes);
       setEditingId(null);
       setEditingContent('');
-      fetchNotes();
       toast.success('Note updated successfully');
     } catch (error) {
       console.error('Error updating note:', error);
@@ -95,15 +93,9 @@ const NotesManager: React.FC = () => {
 
   const deleteNote = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('notes')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
-
-      fetchNotes();
+      const updatedNotes = notes.filter(note => note.id !== id);
+      setNotes(updatedNotes);
+      saveNotesToStorage(updatedNotes);
       toast.success('Note deleted successfully');
     } catch (error) {
       console.error('Error deleting note:', error);

@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Trash2, CheckCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface Task {
@@ -17,6 +16,9 @@ interface Task {
   updated_at: string;
 }
 
+const TASKS_STORAGE_KEY = 'jarvis_tasks';
+const ACTIVITY_STORAGE_KEY = 'jarvis_activity_logs';
+
 const TaskManager: React.FC = () => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -25,45 +27,42 @@ const TaskManager: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
-    subscribeToTasks();
   }, []);
 
-  const fetchTasks = async () => {
+  const fetchTasks = () => {
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setTasks(data || []);
+      const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
+      if (storedTasks) {
+        setTasks(JSON.parse(storedTasks));
+      }
     } catch (error) {
       console.error('Error fetching tasks:', error);
       toast.error('Failed to load tasks');
     }
   };
 
-  const subscribeToTasks = () => {
-    const channel = supabase
-      .channel('tasks-channel')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tasks',
-          filter: `user_id=eq.${user?.id}`
-        },
-        () => {
-          fetchTasks();
-        }
-      )
-      .subscribe();
+  const saveTasks = (tasksToSave: Task[]) => {
+    try {
+      localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasksToSave));
+    } catch (error) {
+      console.error('Error saving tasks:', error);
+    }
+  };
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+  const logActivity = (activityText: string) => {
+    try {
+      const storedLogs = localStorage.getItem(ACTIVITY_STORAGE_KEY);
+      const logs = storedLogs ? JSON.parse(storedLogs) : [];
+      const newLog = {
+        id: Date.now().toString(),
+        activity: activityText,
+        timestamp: new Date().toISOString()
+      };
+      const updatedLogs = [newLog, ...logs].slice(0, 50);
+      localStorage.setItem(ACTIVITY_STORAGE_KEY, JSON.stringify(updatedLogs));
+    } catch (error) {
+      console.error('Error logging activity:', error);
+    }
   };
 
   const createTask = async (e: React.FormEvent) => {
@@ -73,23 +72,18 @@ const TaskManager: React.FC = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('tasks')
-        .insert([
-          {
-            user_id: user.id,
-            title: newTaskTitle.trim(),
-            completed: false
-          }
-        ]);
+      const newTask: Task = {
+        id: Date.now().toString(),
+        title: newTaskTitle.trim(),
+        completed: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
 
-      if (error) throw error;
-
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: `Created task: ${newTaskTitle.trim()}` 
-      });
-
+      const updatedTasks = [newTask, ...tasks];
+      setTasks(updatedTasks);
+      saveTasks(updatedTasks);
+      logActivity(`Created task: ${newTaskTitle.trim()}`);
       setNewTaskTitle('');
       toast.success('Task created successfully');
     } catch (error) {
@@ -102,22 +96,14 @@ const TaskManager: React.FC = () => {
 
   const toggleTask = async (taskId: string, completed: boolean) => {
     try {
-      const { error } = await supabase
-        .from('tasks')
-        .update({ 
-          completed: !completed,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', taskId)
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
-
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: `${!completed ? 'Completed' : 'Uncompleted'} a task` 
-      });
-
+      const updatedTasks = tasks.map(task => 
+        task.id === taskId 
+          ? { ...task, completed: !completed, updated_at: new Date().toISOString() }
+          : task
+      );
+      setTasks(updatedTasks);
+      saveTasks(updatedTasks);
+      logActivity(`${!completed ? 'Completed' : 'Uncompleted'} a task`);
       toast.success(`Task ${!completed ? 'completed' : 'marked as incomplete'}`);
     } catch (error) {
       console.error('Error updating task:', error);
@@ -127,19 +113,10 @@ const TaskManager: React.FC = () => {
 
   const deleteTask = async (taskId: string, title: string) => {
     try {
-      const { error } = await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', taskId)
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
-
-      // Log activity
-      await supabase.rpc('log_activity', { 
-        activity_text: `Deleted task: ${title}` 
-      });
-
+      const updatedTasks = tasks.filter(task => task.id !== taskId);
+      setTasks(updatedTasks);
+      saveTasks(updatedTasks);
+      logActivity(`Deleted task: ${title}`);
       toast.success('Task deleted successfully');
     } catch (error) {
       console.error('Error deleting task:', error);
