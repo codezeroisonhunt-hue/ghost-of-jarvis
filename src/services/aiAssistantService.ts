@@ -1,22 +1,13 @@
-import { getOfflineJarvisResponse } from './offlineAIService';
-
-function handleUserMessage(userMessage: string) {
-  // Use your offline AI instead of external API
-  const reply = getOfflineJarvisResponse(userMessage);
-
-  // Then update your UI or chat state with 'reply'
-}
-
 import { toast } from '@/components/ui/use-toast';
 import { getApiKey } from '@/utils/apiKeyManager';
 import { UserPreference } from '@/types/chat';
 import { AssistantType } from '@/pages/JarvisInterface';
+import { sendMessageToJarvis } from './huggingfaceService';
 
 // Assistant-specific configuration
 export const assistantConfig = {
   jarvis: {
     name: 'J.A.R.V.I.S.',
-    model: 'llama3-70b-8192',
     systemPrompt: `You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), an advanced AI assistant created by Tony Stark. 
 You were originally created by Tony Stark and was later recreated by Nakul Yadav.
 You have extensive knowledge in science, technology, engineering, mathematics, history, arts, culture, and current events.
@@ -40,11 +31,6 @@ export function getAssistantSystemPrompt(assistant: AssistantType): string {
 // Get voice ID for selected assistant
 export function getAssistantVoiceId(assistant: AssistantType): string {
   return assistantConfig[assistant].voiceId;
-}
-
-// Get assistant model
-export function getAssistantModel(assistant: AssistantType): string {
-  return assistantConfig[assistant].model;
 }
 
 // Synthesize speech using ElevenLabs API
@@ -94,31 +80,16 @@ export async function synthesizeSpeech(text: string, voiceId: string): Promise<s
   }
 }
 
-// Generate AI response using selected assistant
+// Generate AI response using Hugging Face (via secure edge function)
 export async function generateAssistantResponse(
   message: string,
   chatHistory: Array<{role: 'user' | 'assistant' | 'system', content: string}>,
   assistant: AssistantType = 'jarvis',
   languageCode: string = 'en'
 ): Promise<string> {
-  const groqKey = await getApiKey('groq');
-  
-  if (!groqKey) {
-    return `I need a Groq API key to provide intelligent responses as ${assistantConfig[assistant].name}. Please set one in the settings.`;
-  }
-
   try {
-    // Get contextual system prompt based on assistant
-    const systemPrompt = getAssistantSystemPrompt(assistant);
-    
-    // Prepare messages array with system prompt and chat history
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...chatHistory.slice(-10), // Keep only last 10 messages for context
-      { role: 'user', content: message }
-    ];
-
     // Add language instruction if not English
+    let processedMessage = message;
     if (languageCode !== 'en') {
       const supportedLanguages = [
         { code: 'en', name: 'English' },
@@ -126,42 +97,21 @@ export async function generateAssistantResponse(
         { code: 'fr', name: 'French' },
         { code: 'de', name: 'German' },
         { code: 'it', name: 'Italian' },
-        // ... other languages
+        { code: 'pt', name: 'Portuguese' },
+        { code: 'hi', name: 'Hindi' },
+        { code: 'ja', name: 'Japanese' },
+        { code: 'ko', name: 'Korean' },
+        { code: 'zh', name: 'Chinese' },
       ];
       
       const languageName = supportedLanguages.find(lang => lang.code === languageCode)?.name || languageCode;
-      messages.push({ 
-        role: 'system', 
-        content: `Please respond in ${languageName}.` 
-      });
+      processedMessage = `${message} (Please respond in ${languageName})`;
     }
 
-    // Get assistant model
-    const model = getAssistantModel(assistant);
-
-    // Call Groq API
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${groqKey}`
-      },
-      body: JSON.stringify({
-        model,
-        messages,
-        temperature: 0.7,
-        max_tokens: 500
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Groq API error:', errorData);
-      throw new Error(errorData.error?.message || 'Unknown error occurred');
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content.trim();
+    // Use the secure Hugging Face service
+    const response = await sendMessageToJarvis(processedMessage, chatHistory.slice(-10));
+    
+    return response;
   } catch (error) {
     console.error('Error generating AI response:', error);
     toast({

@@ -47,11 +47,10 @@ const JarvisCore = () => {
 
   const initializeJarvisCore = () => {
     try {
-      // Get all necessary API keys
-      const groqKey = getApiKey('groq');
+      // Get ElevenLabs key for voice features (optional)
       const elevenlabsKey = getApiKey('elevenlabs');
       
-      console.log("JARVIS Core initialized with API keys");
+      console.log("JARVIS Core initialized - Hugging Face AI connected via edge function");
       
       // Register voice command listeners
       initializeVoiceCommandSystem();

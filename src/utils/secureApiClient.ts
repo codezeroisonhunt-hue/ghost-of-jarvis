@@ -1,16 +1,17 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // Secure API client that routes through Supabase Edge Functions
 export class SecureApiClient {
   
-  // Secure AI chat that doesn't expose API keys
-  static async sendChatMessage(messages: Array<{role: string, content: string}>, mode: string = 'assistant') {
+  // Secure AI chat using Hugging Face (via edge function)
+  static async sendChatMessage(messages: Array<{role: string, content: string}>) {
     try {
-      const { data, error } = await supabase.functions.invoke('ai-chat', {
+      const lastMessage = messages[messages.length - 1]?.content || '';
+      
+      const { data, error } = await supabase.functions.invoke('huggingface-chat', {
         body: {
-          messages,
-          mode
+          message: lastMessage,
+          chatHistory: messages.slice(0, -1)
         }
       });
 
@@ -26,14 +27,14 @@ export class SecureApiClient {
     }
   }
 
-  // Remove any direct API key usage
+  // Remove any direct API key usage from localStorage
   static validateSecureUsage() {
-    // Check if any API keys are exposed in localStorage or global scope
+    // Remove old Groq keys if they exist (no longer needed)
     const dangerousKeys = ['groq_api_key', 'openai_key', 'GROQ_API_KEY'];
     
     dangerousKeys.forEach(key => {
       if (localStorage.getItem(key)) {
-        console.warn(`Removing exposed API key: ${key}`);
+        console.warn(`Removing old API key: ${key} - now using secure edge function`);
         localStorage.removeItem(key);
       }
     });

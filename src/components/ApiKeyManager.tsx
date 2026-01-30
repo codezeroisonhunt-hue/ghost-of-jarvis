@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog';
@@ -22,10 +21,12 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ serviceName, onApiKeySet 
   }, []);
 
   const checkApiKey = async () => {
-    // Convert serviceName to ApiServiceType (lowercase) for the function call
-    const serviceType = serviceName.toLowerCase() as ApiServiceType;
-    const exists = await apiKeyExists(serviceType);
-    setHasKey(exists);
+    // Only check for ElevenLabs now (Hugging Face is server-side)
+    if (serviceName.toLowerCase() === 'elevenlabs') {
+      const serviceType = serviceName.toLowerCase() as ApiServiceType;
+      const exists = await apiKeyExists(serviceType);
+      setHasKey(exists);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +41,16 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ serviceName, onApiKeySet 
       return;
     }
 
-    // Convert serviceName to ApiServiceType (lowercase) for the function call
+    // Only allow ElevenLabs keys to be stored locally
+    if (serviceName.toLowerCase() !== 'elevenlabs') {
+      toast({
+        title: "Not Allowed",
+        description: "This API key is managed on the server.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const serviceType = serviceName.toLowerCase() as ApiServiceType;
     await setApiKey(serviceType, apiKey);
     setIsOpen(false);
@@ -63,7 +73,6 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ serviceName, onApiKeySet 
       setApiKeyValue('');
     }
   };
-
 
   return (
     <>
@@ -91,7 +100,7 @@ const ApiKeyManager: React.FC<ApiKeyManagerProps> = ({ serviceName, onApiKeySet 
                 onChange={(e) => setApiKeyValue(e.target.value)}
                 className="font-mono"
               />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 Your API key will be stored securely in your browser's local storage.
               </p>
             </div>

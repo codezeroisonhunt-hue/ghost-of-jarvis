@@ -2,11 +2,12 @@
  * API Key Manager for JARVIS
  * 
  * This utility helps manage API keys across the application.
- * API keys are stored securely in localStorage - never hardcoded.
+ * API keys are stored securely - Hugging Face key is in Supabase secrets,
+ * ElevenLabs key is stored in localStorage for optional voice features.
  */
 
-// Define valid API service types
-export type ApiServiceType = 'groq' | 'elevenlabs';
+// Define valid API service types (only ElevenLabs needs local storage now)
+export type ApiServiceType = 'elevenlabs';
 
 /**
  * Check if an API key exists for a service
@@ -28,13 +29,6 @@ export const setApiKey = async (service: ApiServiceType, value: string): Promise
  */
 export const getApiKey = async (service: ApiServiceType): Promise<string | null> => {
   return localStorage.getItem(`${service.toLowerCase()}_api_key`);
-};
-
-/**
- * Validate if a Groq API key format is correct
- */
-export const validateGroqApiKey = (key: string): boolean => {
-  return key.startsWith('gsk_') && key.length > 20;
 };
 
 /**

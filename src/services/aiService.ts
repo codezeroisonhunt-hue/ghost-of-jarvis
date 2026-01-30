@@ -1,8 +1,7 @@
-
 // Import memory manager functions
 import { loadMemory, updateMemory } from '@/utils/memoryManager';
 import { getAssistantSystemPrompt } from './aiAssistantService';
-import { getApiKey } from '../utils/apiKeyManager';
+import { sendMessageToJarvis } from './huggingfaceService';
 
 // Interface for the completion request
 export interface CompletionRequest {
@@ -45,36 +44,25 @@ export const updateUserMemory = (message: string): void => {
   }
 };
 
-// Groq completion function
+// Completion function using Hugging Face
 export const createCompletion = async (
   request: CompletionRequest
 ): Promise<CompletionResponse> => {
   try {
-    const apiKey = await getApiKey('groq');
+    const response = await sendMessageToJarvis(request.prompt, []);
     
-    if (!apiKey) {
-      console.error('Groq API key not set. Please set it in settings.');
-      return {
-        text: "I'm unable to respond because my API key hasn't been set. Please go to Settings and set your Groq API key.",
-      };
-    }
-
-    // This is a mock implementation - in a real application, you would call the Groq API
-    console.log('Using API key to call Groq API:', apiKey.substring(0, 3) + '...' + apiKey.substring(apiKey.length - 3));
-    
-    // Simulating a successful response
     return {
-      text: `This is a simulated response. In a real implementation, this would be a response from the Groq API using your API key (starting with ${apiKey.substring(0, 3)}...)`,
+      text: response,
       usage: {
-        promptTokens: request.prompt.length / 4,
-        completionTokens: 50,
-        totalTokens: request.prompt.length / 4 + 50,
+        promptTokens: Math.ceil(request.prompt.length / 4),
+        completionTokens: Math.ceil(response.length / 4),
+        totalTokens: Math.ceil((request.prompt.length + response.length) / 4),
       },
     };
   } catch (error) {
     console.error('Error creating completion:', error);
     return {
-      text: "I encountered an error while processing your request. Please check your API key and try again.",
+      text: "I encountered an error while processing your request. Please try again.",
     };
   }
 };
@@ -87,22 +75,12 @@ export async function generateAssistantResponseWithMemory(
 ): Promise<string> {
   const memory = loadMemory();
 
-  // Example: include user info in system prompt for context
+  // Example: include user info in context
   const userName = memory['userName'] || 'User';
-  const systemPrompt = `${getAssistantSystemPrompt(assistant)}\nUser's name is ${userName}. Remember this.`;
+  const contextMessage = `Remember, the user's name is ${userName}. ${userMessage}`;
 
-  const messages = [
-    { role: 'system', content: systemPrompt },
-    ...chatHistory.slice(-10),
-    { role: 'user', content: userMessage }
-  ];
-
-  // Call the completion function
-  const response = await createCompletion({
-    prompt: messages.map(m => `${m.role}: ${m.content}`).join('\n'),
-    temperature: 0.7,
-    maxTokens: 500
-  });
+  // Use the Hugging Face service
+  const response = await sendMessageToJarvis(contextMessage, chatHistory.slice(-10));
 
   // Update memory if user shares their name
   if (userMessage.toLowerCase().includes('my name is')) {
@@ -110,5 +88,5 @@ export async function generateAssistantResponseWithMemory(
     updateMemory('userName', name);
   }
 
-  return response.text;
+  return response;
 }

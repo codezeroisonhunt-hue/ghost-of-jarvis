@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
-import { getApiKey } from '../utils/apiKeyManager';
 import { Message, ConversationContext } from '@/types/chat';
 import { generateAssistantResponse } from '@/services/aiAssistantService';
 import { getUserMemory, updateUserMemory } from '@/services/aiService';
@@ -40,7 +39,6 @@ export const useChatLogic = (
   });
   
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const apiKey = getApiKey('groq');
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -89,15 +87,6 @@ export const useChatLogic = (
   };
 
   const processUserMessage = async (message: string) => {
-    if (!apiKey && !isSkillCommand(message)) {
-      toast({
-        title: "Groq API Key Required",
-        description: "Please set your Groq API key in the controls panel.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsProcessing(true);
     addMessage('user', message);
     
@@ -115,7 +104,6 @@ export const useChatLogic = (
       // Detect language
       const detectedLanguage = await detectLanguage(message);
       if (detectedLanguage !== selectedLanguage) {
-        // We can use this for auto language switching if needed
         console.log(`Detected language: ${detectedLanguage}, currently using: ${selectedLanguage}`);
       }
       

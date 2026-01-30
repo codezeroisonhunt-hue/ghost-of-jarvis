@@ -102,7 +102,7 @@ const ChatInterface = () => {
         content: userInput
       });
 
-      const response = await SecureApiClient.sendChatMessage(chatMessages, jarvisMode);
+      const response = await SecureApiClient.sendChatMessage(chatMessages);
       
       if (response.success && response.message) {
         const jarvisResponse: Message = {
