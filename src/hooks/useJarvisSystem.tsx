@@ -20,21 +20,12 @@ export const useJarvisSystem = () => {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
 
   const elevenLabsKey = getApiKey('elevenlabs');
-  const groqKey = getApiKey('groq');
   
   useEffect(() => {
     if (!elevenLabsKey && (activeMode === 'voice' || activeMode === 'face')) {
       toast({
         title: "ElevenLabs API Key Required",
-        description: "Voice features require an ElevenLabs API key. Please add it in the controls panel.",
-        variant: "destructive"
-      });
-    }
-    
-    if (!groqKey) {
-      toast({
-        title: "Groq API Key Required",
-        description: "JARVIS requires a Groq API key to function properly. Please add it in the controls panel.",
+        description: "Voice features require an ElevenLabs API key. Please add it in Settings.",
         variant: "destructive"
       });
     }
@@ -43,7 +34,7 @@ export const useJarvisSystem = () => {
     if (activeMode === 'face') {
       checkCameraPermission();
     }
-  }, [elevenLabsKey, groqKey, activeMode]);
+  }, [elevenLabsKey, activeMode]);
   
   // Function to check camera permission
   const checkCameraPermission = async () => {
