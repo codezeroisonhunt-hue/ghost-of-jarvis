@@ -79,11 +79,22 @@ const ChatMode: React.FC<ChatModeProps> = ({
           </div>
         )}
         {isProcessing && !isTyping && (
-          <div className="flex justify-center">
-            <div className="flex space-x-2 items-center">
-              <div className={`w-2 h-2 rounded-full ${hackerMode ? 'bg-red-500/70' : 'bg-white/50'} animate-pulse`}></div>
-              <div className={`w-2 h-2 rounded-full ${hackerMode ? 'bg-red-500/70' : 'bg-white/50'} animate-pulse delay-75`}></div>
-              <div className={`w-2 h-2 rounded-full ${hackerMode ? 'bg-red-500/70' : 'bg-white/50'} animate-pulse delay-150`}></div>
+          <div className="flex justify-start">
+            <div className={`max-w-[80%] rounded-lg px-4 py-3 ${
+              hackerMode 
+                ? "bg-transparent text-red-400 border border-red-500/30" 
+                : "bg-transparent text-white border border-jarvis/30"
+            }`}>
+              <div className="flex items-center gap-2">
+                <div className="flex space-x-1">
+                  <div className={`w-2 h-2 rounded-full ${hackerMode ? 'bg-red-500' : 'bg-jarvis'} animate-bounce`} style={{ animationDelay: '0ms' }}></div>
+                  <div className={`w-2 h-2 rounded-full ${hackerMode ? 'bg-red-500' : 'bg-jarvis'} animate-bounce`} style={{ animationDelay: '150ms' }}></div>
+                  <div className={`w-2 h-2 rounded-full ${hackerMode ? 'bg-red-500' : 'bg-jarvis'} animate-bounce`} style={{ animationDelay: '300ms' }}></div>
+                </div>
+                <span className={`text-sm ${hackerMode ? 'text-red-400/70' : 'text-white/70'}`}>
+                  {hackerMode ? 'Processing...' : 'JARVIS is thinking...'}
+                </span>
+              </div>
             </div>
           </div>
         )}
