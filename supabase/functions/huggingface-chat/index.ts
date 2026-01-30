@@ -31,28 +31,35 @@ serve(async (req) => {
       );
     }
 
-    // Build conversation context from chat history
-    let conversationContext = '';
-    if (chatHistory && Array.isArray(chatHistory)) {
-      const recentHistory = chatHistory.slice(-6); // Keep last 6 messages for context
-      conversationContext = recentHistory.map((msg: { role: string; content: string }) => 
-        `${msg.role.toUpperCase()}: ${msg.content}`
-      ).join('\n');
-    }
-
-    // Build the prompt in the format expected by Llama
+    // Build messages array for chat completions format
     const systemPrompt = `You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), an advanced AI assistant. 
 You were originally created by Tony Stark and was later recreated by Nakul Yadav.
 You are helpful, informative, precise, and slightly witty. You provide concise but complete answers.
 Always maintain a professional yet friendly demeanor. If you don't know something, admit it.`;
 
-    const fullPrompt = conversationContext 
-      ? `SYSTEM: ${systemPrompt}\n${conversationContext}\nUSER: ${message}\nJARVIS:`
-      : `SYSTEM: ${systemPrompt}\nUSER: ${message}\nJARVIS:`;
+    // Build messages in OpenAI chat format
+    const messages: Array<{role: string, content: string}> = [
+      { role: 'system', content: systemPrompt }
+    ];
+    
+    // Add chat history
+    if (chatHistory && Array.isArray(chatHistory)) {
+      const recentHistory = chatHistory.slice(-6);
+      for (const msg of recentHistory) {
+        messages.push({
+          role: msg.role === 'assistant' ? 'assistant' : 'user',
+          content: msg.content
+        });
+      }
+    }
+    
+    // Add current message
+    messages.push({ role: 'user', content: message });
 
-    // Call Hugging Face Inference API
+    // Call Hugging Face Router API (OpenAI-compatible chat completions)
+    // Using hf-inference provider (free tier) with a supported model
     const response = await fetch(
-      'https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3.1-8B-Instruct',
+      'https://router.huggingface.co/v1/chat/completions',
       {
         method: 'POST',
         headers: {
@@ -60,14 +67,11 @@ Always maintain a professional yet friendly demeanor. If you don't know somethin
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          inputs: fullPrompt,
-          parameters: {
-            max_new_tokens: 500,
-            temperature: 0.7,
-            top_p: 0.95,
-            do_sample: true,
-            return_full_text: false
-          }
+          model: 'Qwen/Qwen2.5-72B-Instruct:novita',
+          messages: messages,
+          max_tokens: 500,
+          temperature: 0.7,
+          top_p: 0.95
         }),
       }
     );
@@ -102,25 +106,21 @@ Always maintain a professional yet friendly demeanor. If you don't know somethin
 
     const data = await response.json();
     
-    // Handle different response formats from Hugging Face
+    // Extract message from OpenAI-compatible response format
     let generatedText = '';
     
-    if (Array.isArray(data) && data.length > 0) {
+    if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+      generatedText = data.choices[0].message.content || '';
+    } else if (Array.isArray(data) && data.length > 0) {
       generatedText = data[0].generated_text || '';
     } else if (data.generated_text) {
       generatedText = data.generated_text;
-    } else if (typeof data === 'string') {
-      generatedText = data;
     }
 
-    // Clean up the response - remove any leftover prompt markers
-    generatedText = generatedText
-      .replace(/^JARVIS:\s*/i, '')
-      .replace(/\nUSER:.*$/s, '')
-      .replace(/\nSYSTEM:.*$/s, '')
-      .trim();
+    generatedText = generatedText.trim();
 
     if (!generatedText) {
+      console.error('No generated text in response:', JSON.stringify(data));
       return new Response(
         JSON.stringify({ error: 'No response generated. Please try again.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
