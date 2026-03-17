@@ -39,17 +39,17 @@ function App() {
                       <Dashboard />
                     </ProtectedRoute>
                   } />
-                  <Route path="/interface" element={<JarvisInterface />} />
-                  <Route path="/jarvis" element={<JarvisInterface />} /> 
-                  <Route path="/jarvis-v2" element={<JarvisV2Interface />} />
-                  <Route path="/code-zero" element={<JarvisV2Interface />} />
-                  <Route path="/ghost" element={<JarvisV2Interface />} />
-                  <Route path="/image-generation" element={<ImageGeneration />} />
-                  <Route path="/images" element={<ImageGeneration />} />
-                  <Route path="/settings" element={<JarvisSettings />} />
-                  <Route path="/features" element={<FeaturesOverview />} />
-                  <Route path="/satellite" element={<SatelliteSurveillancePage />} />
-                  <Route path="/osint" element={<OSINTSearch />} />
+                  <Route path="/interface" element={<ProtectedRoute><JarvisInterface /></ProtectedRoute>} />
+                  <Route path="/jarvis" element={<ProtectedRoute><JarvisInterface /></ProtectedRoute>} /> 
+                  <Route path="/jarvis-v2" element={<ProtectedRoute><JarvisV2Interface /></ProtectedRoute>} />
+                  <Route path="/code-zero" element={<ProtectedRoute><JarvisV2Interface /></ProtectedRoute>} />
+                  <Route path="/ghost" element={<ProtectedRoute><JarvisV2Interface /></ProtectedRoute>} />
+                  <Route path="/image-generation" element={<ProtectedRoute><ImageGeneration /></ProtectedRoute>} />
+                  <Route path="/images" element={<ProtectedRoute><ImageGeneration /></ProtectedRoute>} />
+                  <Route path="/settings" element={<ProtectedRoute><JarvisSettings /></ProtectedRoute>} />
+                  <Route path="/features" element={<ProtectedRoute><FeaturesOverview /></ProtectedRoute>} />
+                  <Route path="/satellite" element={<ProtectedRoute><SatelliteSurveillancePage /></ProtectedRoute>} />
+                  <Route path="/osint" element={<ProtectedRoute><OSINTSearch /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </JarvisModeEnhancer>
