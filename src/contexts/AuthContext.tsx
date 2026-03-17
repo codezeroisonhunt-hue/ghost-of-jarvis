@@ -33,7 +33,6 @@ export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Existing session:', session);
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
