@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const STOCK_SYMBOLS = ["AAPL","MSFT","GOOGL","AMZN","NVDA","TSLA","META","NFLX","RELIANCE.NS","TCS.NS","INFY.NS","HDFCBANK.NS"];
+
 
 // Stooq mappings (free, no auth, CSV) — US tickers as .us, Indian as .nse
 const STOCK_TICKERS: { stooq: string; symbol: string; name: string; currency: string }[] = [
