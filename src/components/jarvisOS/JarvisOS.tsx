@@ -6,6 +6,7 @@ import CommandCenter from "./CommandCenter";
 import ModulePlaceholder from "./ModulePlaceholder";
 import FloatingOrb from "./FloatingOrb";
 import StartupLoader from "./StartupLoader";
+import MarketsModule from "./modules/MarketsModule";
 
 export default function JarvisOS() {
   const [active, setActive] = useState<FeatureKey>("command-center");
@@ -49,9 +50,13 @@ export default function JarvisOS() {
       <div className="flex-1 flex flex-col min-w-0">
         <JarvisTopBar feature={feature} onMenu={() => setMobileOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          {active === "command-center"
-            ? <CommandCenter onOpen={setActive} />
-            : <ModulePlaceholder feature={feature} />}
+          {active === "command-center" ? (
+            <CommandCenter onOpen={setActive} />
+          ) : active === "stocks" ? (
+            <MarketsModule />
+          ) : (
+            <ModulePlaceholder feature={feature} />
+          )}
         </main>
       </div>
 
