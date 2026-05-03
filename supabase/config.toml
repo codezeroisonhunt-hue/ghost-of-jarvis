@@ -1,4 +1,7 @@
 project_id = "ymmucjcnlvpbskixuqbw"
 
+[functions.huggingface-chat]
+verify_jwt = true
+
 [functions.markets]
 verify_jwt = false
