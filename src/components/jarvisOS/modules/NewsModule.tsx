@@ -17,6 +17,19 @@ const CHANNELS = [
   { key: "nytimes.com", label: "NY Times" },
 ];
 
+const KANNADA_CHANNELS = [
+  { key: "prajavani.net", label: "Prajavani" },
+  { key: "vijaykarnataka.com", label: "Vijay Karnataka" },
+  { key: "kannadaprabha.com", label: "Kannada Prabha" },
+  { key: "udayavani.com", label: "Udayavani" },
+  { key: "vijayavani.net", label: "Vijayavani" },
+  { key: "kannada.oneindia.com", label: "OneIndia Kannada" },
+  { key: "kannada.asianetnews.com", label: "Asianet Suvarna" },
+  { key: "tv9kannada.com", label: "TV9 Kannada" },
+  { key: "news18.com/kannada", label: "News18 Kannada" },
+  { key: "publictv.in", label: "Public TV" },
+];
+
 interface Article {
   title: string;
   source: string;
@@ -162,6 +175,23 @@ export default function NewsModule() {
             <button onClick={() => setChannel("")} className="shrink-0 px-2 py-1 rounded-full text-[10px] font-mono border border-accent/60 text-accent">ALL ×</button>
           )}
           {CHANNELS.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => { setTopic(""); setQuery(""); setChannel(c.key); }}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider border transition ${
+                channel === c.key
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-border/60 text-muted-foreground hover:border-primary/40"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-2 flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          <span className="shrink-0 text-[10px] font-mono text-primary tracking-widest pr-1">ಕನ್ನಡ · KANNADA</span>
+          {KANNADA_CHANNELS.map((c) => (
             <button
               key={c.key}
               onClick={() => { setTopic(""); setQuery(""); setChannel(c.key); }}
