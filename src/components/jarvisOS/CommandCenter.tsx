@@ -51,15 +51,15 @@ export default function CommandCenter({ onOpen }: { onOpen: (k: FeatureKey) => v
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {FEATURES.filter((f) => f.key !== "command-center").map((f) => {
             const Icon = f.icon;
-            const accent = f.accent === "red" ? "accent" : "primary";
+            const red = f.accent === "red";
             return (
               <button
                 key={f.key}
                 onClick={() => onOpen(f.key)}
-                className={`group glass-panel p-4 text-left hover:scale-[1.02] hover:border-${accent} transition-all relative overflow-hidden`}
+                className="group glass-panel p-4 text-left hover:scale-[1.02] transition-all relative overflow-hidden"
               >
-                <div className={`h-10 w-10 rounded-lg bg-${accent}/15 border border-${accent}/40 flex items-center justify-center mb-3`}>
-                  <Icon className={`h-5 w-5 ${f.accent === "red" ? "text-accent" : "text-primary"}`} />
+                <div className={`h-10 w-10 rounded-lg border flex items-center justify-center mb-3 ${red ? "bg-accent/15 border-accent/40" : "bg-primary/15 border-primary/40"}`}>
+                  <Icon className={`h-5 w-5 ${red ? "text-accent" : "text-primary"}`} />
                 </div>
                 <div className="text-sm font-semibold">{f.label}</div>
                 <div className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">{f.description}</div>
