@@ -17,6 +17,19 @@ const CHANNELS = [
   { key: "nytimes.com", label: "NY Times" },
 ];
 
+const KANNADA_CHANNELS = [
+  { key: "prajavani.net", label: "Prajavani" },
+  { key: "vijaykarnataka.com", label: "Vijay Karnataka" },
+  { key: "kannadaprabha.com", label: "Kannada Prabha" },
+  { key: "udayavani.com", label: "Udayavani" },
+  { key: "vijayavani.net", label: "Vijayavani" },
+  { key: "kannada.oneindia.com", label: "OneIndia Kannada" },
+  { key: "kannada.asianetnews.com", label: "Asianet Suvarna" },
+  { key: "tv9kannada.com", label: "TV9 Kannada" },
+  { key: "news18.com/kannada", label: "News18 Kannada" },
+  { key: "publictv.in", label: "Public TV" },
+];
+
 interface Article {
   title: string;
   source: string;
