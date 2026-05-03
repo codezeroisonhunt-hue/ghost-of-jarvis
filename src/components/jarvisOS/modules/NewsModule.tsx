@@ -144,9 +144,29 @@ export default function NewsModule() {
           {CATEGORIES.map((c) => (
             <button
               key={c.key}
-              onClick={() => { setTopic(""); setQuery(""); setCategory(c.key); }}
+              onClick={() => { setTopic(""); setQuery(""); setChannel(""); setCategory(c.key); }}
               className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider border transition ${
-                category === c.key && !topic
+                category === c.key && !topic && !channel
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-border/60 text-muted-foreground hover:border-primary/40"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-2 flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          <span className="shrink-0 text-[10px] font-mono text-muted-foreground tracking-widest pr-1">CHANNELS</span>
+          {channel && (
+            <button onClick={() => setChannel("")} className="shrink-0 px-2 py-1 rounded-full text-[10px] font-mono border border-accent/60 text-accent">ALL ×</button>
+          )}
+          {CHANNELS.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => { setTopic(""); setQuery(""); setChannel(c.key); }}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider border transition ${
+                channel === c.key
                   ? "border-primary bg-primary/15 text-primary"
                   : "border-border/60 text-muted-foreground hover:border-primary/40"
               }`}
