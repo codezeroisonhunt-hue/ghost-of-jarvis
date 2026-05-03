@@ -49,21 +49,30 @@ function timeAgo(iso: string): string {
 export default function NewsModule() {
   const [category, setCategory] = useState("top");
   const [topic, setTopic] = useState("");
+  const [channel, setChannel] = useState("");
   const [query, setQuery] = useState("");
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [live, setLive] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const timerRef = useRef<number | null>(null);
 
-  async function load(opts?: { category?: string; topic?: string }) {
+  async function load(opts?: { category?: string; topic?: string; channel?: string }) {
     setLoading(true);
     setError(null);
     try {
       const { data, error: e } = await supabase.functions.invoke("news", {
-        body: { category: opts?.category ?? category, topic: opts?.topic ?? topic },
+        body: {
+          category: opts?.category ?? category,
+          topic: opts?.topic ?? topic,
+          channel: opts?.channel ?? channel,
+        },
       });
       if (e) throw e;
       if ((data as any)?.error) throw new Error((data as any).error);
       setArticles((data as any)?.articles ?? []);
+      setLastUpdate(new Date());
     } catch (e: any) {
       setError(e.message ?? "Failed to load news");
       setArticles([]);
@@ -72,7 +81,15 @@ export default function NewsModule() {
     }
   }
 
-  useEffect(() => { load({ category, topic: "" }); /* eslint-disable-next-line */ }, [category]);
+  useEffect(() => { load({ category, topic: "", channel }); /* eslint-disable-next-line */ }, [category, channel]);
+
+  // Real-time auto-refresh every 60s
+  useEffect(() => {
+    if (!live) return;
+    timerRef.current = window.setInterval(() => load(), 60000);
+    return () => { if (timerRef.current) window.clearInterval(timerRef.current); };
+    // eslint-disable-next-line
+  }, [live, category, channel, topic]);
 
   return (
     <div className="animate-fade-in space-y-4">
