@@ -100,15 +100,26 @@ export default function NewsModule() {
             <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
               <Newspaper className="h-6 w-6 text-primary" /> Live News
             </h1>
-            <p className="text-xs text-muted-foreground mt-1">Global signals · GDELT + Hacker News</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Global signals · GDELT + HN {lastUpdate && <span className="text-primary/70">· updated {lastUpdate.toLocaleTimeString()}</span>}
+            </p>
           </div>
-          <button
-            onClick={() => load()}
-            disabled={loading}
-            className="px-4 py-2 rounded-lg border border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary text-sm font-mono flex items-center gap-2 disabled:opacity-50"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> REFRESH
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setLive(v => !v)}
+              className={`px-3 py-2 rounded-lg border text-xs font-mono flex items-center gap-1.5 transition ${live ? "border-primary bg-primary/15 text-primary" : "border-border/60 text-muted-foreground"}`}
+              title="Auto-refresh every 60s"
+            >
+              <Radio className={`h-3.5 w-3.5 ${live ? "animate-pulse" : ""}`} /> {live ? "LIVE" : "PAUSED"}
+            </button>
+            <button
+              onClick={() => load()}
+              disabled={loading}
+              className="px-4 py-2 rounded-lg border border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary text-sm font-mono flex items-center gap-2 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> REFRESH
+            </button>
+          </div>
         </div>
 
         <form
