@@ -189,6 +189,23 @@ export default function NewsModule() {
           ))}
         </div>
 
+        <div className="mt-2 flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          <span className="shrink-0 text-[10px] font-mono text-primary tracking-widest pr-1">ಕನ್ನಡ · KANNADA</span>
+          {KANNADA_CHANNELS.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => { setTopic(""); setQuery(""); setChannel(c.key); }}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider border transition ${
+                channel === c.key
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-border/60 text-muted-foreground hover:border-primary/40"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
         {error && (
           <div className="mt-3 text-xs text-accent flex items-center gap-1">
             <AlertTriangle className="h-3 w-3" /> {error}
