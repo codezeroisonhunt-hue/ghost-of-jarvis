@@ -15,12 +15,17 @@ export interface ApiKeyValidation {
   };
 }
 
-const DEFAULT_GROQ_KEY = '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';
-
 export const useApiKeys = () => {
-  const [apiKeys, setApiKeys] = useState<ApiKeys>({
-    groqKey: localStorage.getItem('groqKey') || DEFAULT_GROQ_KEY,
-    elevenLabsKey: localStorage.getItem('elevenLabsKey') || ''
+  const [apiKeys, setApiKeys] = useState<ApiKeys>(() => {
+    // Purge any previously-cached default Groq key from localStorage
+    const storedGroq = localStorage.getItem('groqKey') || '';
+    if (storedGroq.startsWith('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')) {
+      localStorage.removeItem('groqKey');
+    }
+    return {
+      groqKey: localStorage.getItem('groqKey') || '',
+      elevenLabsKey: localStorage.getItem('elevenLabsKey') || ''
+    };
   });
 
   // Validate API keys whenever they change
