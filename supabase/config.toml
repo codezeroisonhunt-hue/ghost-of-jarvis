@@ -1,10 +1,1 @@
-project_id = "ymmucjcnlvpbskixuqbw"
-
-[functions.huggingface-chat]
-verify_jwt = true
-
-[functions.markets]
-verify_jwt = false
-
-[functions.market-advisor]
-verify_jwt = false
+project_id = "igtdohydwjscuwhewqlh"
