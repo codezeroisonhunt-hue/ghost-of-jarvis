@@ -1,1 +1,4 @@
 project_id = "pmsdcglwfuvboxtqwuln"
+
+[functions.huggingface-chat]
+verify_jwt = true
