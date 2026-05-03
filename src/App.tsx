@@ -21,6 +21,8 @@ import Dashboard from "./components/dashboard/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import JarvisModeSwitcher from "./components/JarvisModeSwitcher";
 import JarvisV2Interface from "./pages/JarvisV2Interface";
+import JarvisOS from "./components/jarvisOS/JarvisOS";
+import PracticalDashboard from "./components/dashboard/PracticalDashboard";
 
 function App() {
   return (
@@ -36,7 +38,12 @@ function App() {
                   <Route path="/startup" element={<Startup />} />
                   <Route path="/dashboard" element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <JarvisOS />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/classic-dashboard" element={
+                    <ProtectedRoute>
+                      <PracticalDashboard />
                     </ProtectedRoute>
                   } />
                   <Route path="/interface" element={<ProtectedRoute><JarvisInterface /></ProtectedRoute>} />
