@@ -1,6 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Newspaper, RefreshCw, ExternalLink, Search, AlertTriangle } from "lucide-react";
+import { Newspaper, RefreshCw, ExternalLink, Search, AlertTriangle, Radio } from "lucide-react";
+
+const CHANNELS = [
+  { key: "bbc.com", label: "BBC" },
+  { key: "reuters.com", label: "Reuters" },
+  { key: "cnn.com", label: "CNN" },
+  { key: "theverge.com", label: "Verge" },
+  { key: "techcrunch.com", label: "TechCrunch" },
+  { key: "bloomberg.com", label: "Bloomberg" },
+  { key: "ndtv.com", label: "NDTV" },
+  { key: "thehindu.com", label: "The Hindu" },
+  { key: "indiatoday.in", label: "India Today" },
+  { key: "aljazeera.com", label: "Al Jazeera" },
+  { key: "wired.com", label: "Wired" },
+  { key: "nytimes.com", label: "NY Times" },
+];
 
 interface Article {
   title: string;
