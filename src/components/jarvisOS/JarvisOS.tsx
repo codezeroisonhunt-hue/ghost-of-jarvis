@@ -8,6 +8,7 @@ import FloatingOrb from "./FloatingOrb";
 import StartupLoader from "./StartupLoader";
 import MarketsModule from "./modules/MarketsModule";
 import TradeAdvisorModule from "./modules/TradeAdvisorModule";
+import NewsModule from "./modules/NewsModule";
 
 export default function JarvisOS() {
   const [active, setActive] = useState<FeatureKey>("command-center");
@@ -57,6 +58,8 @@ export default function JarvisOS() {
             <MarketsModule />
           ) : active === "trade" ? (
             <TradeAdvisorModule />
+          ) : active === "news" ? (
+            <NewsModule />
           ) : (
             <ModulePlaceholder feature={feature} />
           )}
