@@ -8,49 +8,47 @@ const corsHeaders = {
 
 
 // Stooq mappings (free, no auth, CSV) — US tickers as .us, Indian as .nse
-const STOCK_TICKERS: { stooq: string; symbol: string; name: string; currency: string }[] = [
-  { stooq: "aapl.us", symbol: "AAPL", name: "Apple", currency: "USD" },
-  { stooq: "msft.us", symbol: "MSFT", name: "Microsoft", currency: "USD" },
-  { stooq: "googl.us", symbol: "GOOGL", name: "Alphabet", currency: "USD" },
-  { stooq: "amzn.us", symbol: "AMZN", name: "Amazon", currency: "USD" },
-  { stooq: "nvda.us", symbol: "NVDA", name: "NVIDIA", currency: "USD" },
-  { stooq: "tsla.us", symbol: "TSLA", name: "Tesla", currency: "USD" },
-  { stooq: "meta.us", symbol: "META", name: "Meta", currency: "USD" },
-  { stooq: "nflx.us", symbol: "NFLX", name: "Netflix", currency: "USD" },
-  { stooq: "reliance.in", symbol: "RELIANCE", name: "Reliance Industries", currency: "INR" },
-  { stooq: "tcs.in", symbol: "TCS", name: "Tata Consultancy", currency: "INR" },
-  { stooq: "infy.in", symbol: "INFY", name: "Infosys", currency: "INR" },
-  { stooq: "hdfcbank.in", symbol: "HDFCBANK", name: "HDFC Bank", currency: "INR" },
+const STOCK_TICKERS: { symbol: string; name: string }[] = [
+  { symbol: "AAPL", name: "Apple" },
+  { symbol: "MSFT", name: "Microsoft" },
+  { symbol: "GOOGL", name: "Alphabet" },
+  { symbol: "AMZN", name: "Amazon" },
+  { symbol: "NVDA", name: "NVIDIA" },
+  { symbol: "TSLA", name: "Tesla" },
+  { symbol: "META", name: "Meta" },
+  { symbol: "NFLX", name: "Netflix" },
+  { symbol: "RELIANCE.NS", name: "Reliance Industries" },
+  { symbol: "TCS.NS", name: "Tata Consultancy" },
+  { symbol: "INFY.NS", name: "Infosys" },
+  { symbol: "HDFCBANK.NS", name: "HDFC Bank" },
 ];
 
-async function fetchStocks() {
-  const list = STOCK_TICKERS.map(t => t.stooq).join(",");
-  const url = `https://stooq.com/q/l/?s=${list}&f=sd2t2ohlcvn&h&e=csv`;
+async function fetchOne(symbol: string, name: string) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d`;
   const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-  if (!res.ok) throw new Error(`Stooq error ${res.status}`);
-  const csv = await res.text();
-  const lines = csv.trim().split("\n");
-  const header = lines.shift()?.split(",") ?? [];
-  const idx = (k: string) => header.indexOf(k);
-  const iSym = idx("Symbol"), iClose = idx("Close"), iOpen = idx("Open");
+  if (!res.ok) throw new Error(`${symbol} ${res.status}`);
+  const json = await res.json();
+  const meta = json?.chart?.result?.[0]?.meta;
+  if (!meta) throw new Error(`${symbol} no meta`);
+  const price = meta.regularMarketPrice;
+  const prev = meta.chartPreviousClose ?? meta.previousClose;
+  const change = price - prev;
+  const changePct = prev ? (change / prev) * 100 : 0;
+  return {
+    symbol,
+    name: meta.shortName || meta.longName || name,
+    price,
+    change,
+    changePct,
+    currency: meta.currency || "USD",
+  };
+}
 
-  return lines.map(line => {
-    const cells = line.split(",");
-    const stooqSym = (cells[iSym] || "").toLowerCase();
-    const meta = STOCK_TICKERS.find(t => t.stooq === stooqSym);
-    const close = parseFloat(cells[iClose]);
-    const open = parseFloat(cells[iOpen]);
-    const change = isFinite(close) && isFinite(open) ? close - open : null;
-    const changePct = isFinite(close) && isFinite(open) && open !== 0 ? ((close - open) / open) * 100 : null;
-    return {
-      symbol: meta?.symbol ?? stooqSym.toUpperCase(),
-      name: meta?.name ?? stooqSym,
-      price: isFinite(close) ? close : null,
-      change,
-      changePct,
-      currency: meta?.currency ?? "USD",
-    };
-  }).filter(s => s.price != null);
+async function fetchStocks() {
+  const results = await Promise.allSettled(STOCK_TICKERS.map(t => fetchOne(t.symbol, t.name)));
+  return results
+    .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
+    .map(r => r.value);
 }
 
 async function fetchCrypto() {
