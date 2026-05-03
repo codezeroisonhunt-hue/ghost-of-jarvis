@@ -1,6 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Newspaper, RefreshCw, ExternalLink, Search, AlertTriangle } from "lucide-react";
+import { Newspaper, RefreshCw, ExternalLink, Search, AlertTriangle, Radio } from "lucide-react";
+
+const CHANNELS = [
+  { key: "bbc.com", label: "BBC" },
+  { key: "reuters.com", label: "Reuters" },
+  { key: "cnn.com", label: "CNN" },
+  { key: "theverge.com", label: "Verge" },
+  { key: "techcrunch.com", label: "TechCrunch" },
+  { key: "bloomberg.com", label: "Bloomberg" },
+  { key: "ndtv.com", label: "NDTV" },
+  { key: "thehindu.com", label: "The Hindu" },
+  { key: "indiatoday.in", label: "India Today" },
+  { key: "aljazeera.com", label: "Al Jazeera" },
+  { key: "wired.com", label: "Wired" },
+  { key: "nytimes.com", label: "NY Times" },
+];
 
 interface Article {
   title: string;
@@ -34,21 +49,30 @@ function timeAgo(iso: string): string {
 export default function NewsModule() {
   const [category, setCategory] = useState("top");
   const [topic, setTopic] = useState("");
+  const [channel, setChannel] = useState("");
   const [query, setQuery] = useState("");
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [live, setLive] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const timerRef = useRef<number | null>(null);
 
-  async function load(opts?: { category?: string; topic?: string }) {
+  async function load(opts?: { category?: string; topic?: string; channel?: string }) {
     setLoading(true);
     setError(null);
     try {
       const { data, error: e } = await supabase.functions.invoke("news", {
-        body: { category: opts?.category ?? category, topic: opts?.topic ?? topic },
+        body: {
+          category: opts?.category ?? category,
+          topic: opts?.topic ?? topic,
+          channel: opts?.channel ?? channel,
+        },
       });
       if (e) throw e;
       if ((data as any)?.error) throw new Error((data as any).error);
       setArticles((data as any)?.articles ?? []);
+      setLastUpdate(new Date());
     } catch (e: any) {
       setError(e.message ?? "Failed to load news");
       setArticles([]);
@@ -57,7 +81,15 @@ export default function NewsModule() {
     }
   }
 
-  useEffect(() => { load({ category, topic: "" }); /* eslint-disable-next-line */ }, [category]);
+  useEffect(() => { load({ category, topic: "", channel }); /* eslint-disable-next-line */ }, [category, channel]);
+
+  // Real-time auto-refresh every 60s
+  useEffect(() => {
+    if (!live) return;
+    timerRef.current = window.setInterval(() => load(), 60000);
+    return () => { if (timerRef.current) window.clearInterval(timerRef.current); };
+    // eslint-disable-next-line
+  }, [live, category, channel, topic]);
 
   return (
     <div className="animate-fade-in space-y-4">
@@ -68,15 +100,26 @@ export default function NewsModule() {
             <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
               <Newspaper className="h-6 w-6 text-primary" /> Live News
             </h1>
-            <p className="text-xs text-muted-foreground mt-1">Global signals · GDELT + Hacker News</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Global signals · GDELT + HN {lastUpdate && <span className="text-primary/70">· updated {lastUpdate.toLocaleTimeString()}</span>}
+            </p>
           </div>
-          <button
-            onClick={() => load()}
-            disabled={loading}
-            className="px-4 py-2 rounded-lg border border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary text-sm font-mono flex items-center gap-2 disabled:opacity-50"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> REFRESH
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setLive(v => !v)}
+              className={`px-3 py-2 rounded-lg border text-xs font-mono flex items-center gap-1.5 transition ${live ? "border-primary bg-primary/15 text-primary" : "border-border/60 text-muted-foreground"}`}
+              title="Auto-refresh every 60s"
+            >
+              <Radio className={`h-3.5 w-3.5 ${live ? "animate-pulse" : ""}`} /> {live ? "LIVE" : "PAUSED"}
+            </button>
+            <button
+              onClick={() => load()}
+              disabled={loading}
+              className="px-4 py-2 rounded-lg border border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary text-sm font-mono flex items-center gap-2 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> REFRESH
+            </button>
+          </div>
         </div>
 
         <form
@@ -101,9 +144,29 @@ export default function NewsModule() {
           {CATEGORIES.map((c) => (
             <button
               key={c.key}
-              onClick={() => { setTopic(""); setQuery(""); setCategory(c.key); }}
+              onClick={() => { setTopic(""); setQuery(""); setChannel(""); setCategory(c.key); }}
               className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider border transition ${
-                category === c.key && !topic
+                category === c.key && !topic && !channel
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-border/60 text-muted-foreground hover:border-primary/40"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-2 flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          <span className="shrink-0 text-[10px] font-mono text-muted-foreground tracking-widest pr-1">CHANNELS</span>
+          {channel && (
+            <button onClick={() => setChannel("")} className="shrink-0 px-2 py-1 rounded-full text-[10px] font-mono border border-accent/60 text-accent">ALL ×</button>
+          )}
+          {CHANNELS.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => { setTopic(""); setQuery(""); setChannel(c.key); }}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider border transition ${
+                channel === c.key
                   ? "border-primary bg-primary/15 text-primary"
                   : "border-border/60 text-muted-foreground hover:border-primary/40"
               }`}

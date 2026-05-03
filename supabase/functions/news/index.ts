@@ -55,16 +55,21 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     let category = url.searchParams.get("category") ?? "top";
     let topic = url.searchParams.get("topic") ?? "";
+    let channel = url.searchParams.get("channel") ?? "";
     if (req.method === "POST") {
       try {
         const b = await req.json();
         category = b.category ?? category;
         topic = b.topic ?? topic;
+        channel = b.channel ?? channel;
       } catch {}
     }
 
     let articles: Article[] = [];
-    if (topic) {
+    if (channel) {
+      const q = topic ? `domain:${channel} ${topic}` : `domain:${channel}`;
+      articles = await fetchGDELT(q, category || "channel", 20);
+    } else if (topic) {
       articles = await fetchGDELT(topic, category);
     } else {
       switch (category) {
