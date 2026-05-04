@@ -1,6 +1,7 @@
 import React from "react";
 import { FEATURES, FeatureKey } from "./featureRegistry";
 import { Activity, Cpu, Wifi, Zap } from "lucide-react";
+import WeatherDashboardCard from "./WeatherDashboardCard";
 
 const stats = [
   { label: "System", value: "98%", icon: Cpu },
@@ -23,6 +24,9 @@ export default function CommandCenter({ onOpen }: { onOpen: (k: FeatureKey) => v
         </h1>
         <p className="text-sm text-muted-foreground mt-1">All systems operational. 17 modules ready.</p>
       </div>
+
+      {/* Live Weather */}
+      <WeatherDashboardCard onOpen={() => onOpen("weather")} />
 
       {/* Stat strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
