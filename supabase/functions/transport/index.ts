@@ -181,6 +181,52 @@ serve(async (req) => {
       });
     }
 
+    if (action === "train-schedule") {
+      const trainNo = body.trainNo || url.searchParams.get("trainNo");
+      if (!trainNo) throw new Error("trainNo required");
+      const stops = await fetchTrainSchedule(trainNo);
+      return new Response(JSON.stringify({ trainNo, stops, updatedAt: new Date().toISOString() }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "train-info") {
+      const q = body.query || body.trainNo || url.searchParams.get("query");
+      if (!q) throw new Error("query required");
+      const info = await fetchTrainInfo(q);
+      return new Response(JSON.stringify({ trains: info, updatedAt: new Date().toISOString() }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "train-live") {
+      const trainNo = body.trainNo || url.searchParams.get("trainNo");
+      const date = body.date || url.searchParams.get("date");
+      if (!trainNo) throw new Error("trainNo required");
+      const live = await fetchLiveStatus(trainNo, date);
+      return new Response(JSON.stringify({ trainNo, live, updatedAt: new Date().toISOString() }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "pnr") {
+      const pnr = body.pnr || url.searchParams.get("pnr");
+      if (!pnr || !/^\d{10}$/.test(String(pnr))) throw new Error("Valid 10-digit PNR required");
+      const data = await fetchPNR(String(pnr));
+      return new Response(JSON.stringify({ pnr, data, updatedAt: new Date().toISOString() }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "station-live") {
+      const code = body.code || url.searchParams.get("code");
+      const hours = Number(body.hours || url.searchParams.get("hours") || 2);
+      if (!code) throw new Error("station code required");
+      const trains = await fetchStationLive(String(code).toUpperCase(), hours);
+      return new Response(JSON.stringify({ code, trains, updatedAt: new Date().toISOString() }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     if (action === "traffic") {
       const from = body.from || url.searchParams.get("from");
       const to = body.to || url.searchParams.get("to");
