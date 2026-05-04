@@ -10,6 +10,7 @@ import MarketsModule from "./modules/MarketsModule";
 import TradeAdvisorModule from "./modules/TradeAdvisorModule";
 import NewsModule from "./modules/NewsModule";
 import SportsModule from "./modules/SportsModule";
+import WeatherModule from "./modules/WeatherModule";
 
 export default function JarvisOS() {
   const [active, setActive] = useState<FeatureKey>("command-center");
@@ -63,6 +64,8 @@ export default function JarvisOS() {
             <NewsModule />
           ) : active === "sports" ? (
             <SportsModule />
+          ) : active === "weather" ? (
+            <WeatherModule />
           ) : (
             <ModulePlaceholder feature={feature} />
           )}

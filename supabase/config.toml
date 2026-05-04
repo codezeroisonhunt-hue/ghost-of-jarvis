@@ -1,1 +1,16 @@
 project_id = "hlhrohrzdzrddywwbjlf"
+
+[functions.weather]
+verify_jwt = false
+
+[functions.news]
+verify_jwt = false
+
+[functions.sports]
+verify_jwt = false
+
+[functions.markets]
+verify_jwt = false
+
+[functions.market-advisor]
+verify_jwt = false
