@@ -1,11 +1,11 @@
 import {
   LayoutDashboard, TrendingUp, Newspaper, Search, Briefcase, Link2, Atom,
   ShoppingBag, HeartPulse, Users, BrainCircuit, FlaskConical, ShieldAlert,
-  Presentation, Cpu, Settings2, Smartphone, Mic, Trophy, CloudSun, LucideIcon,
+  Presentation, Cpu, Settings2, Smartphone, Mic, Trophy, CloudSun, Navigation, Banknote, LucideIcon,
 } from "lucide-react";
 
 export type FeatureKey =
-  | "command-center" | "stocks" | "news" | "sports" | "weather" | "search" | "business" | "links"
+  | "command-center" | "stocks" | "money" | "news" | "sports" | "weather" | "transport" | "search" | "business" | "links"
   | "atomic" | "trade" | "health" | "users" | "memory" | "lab" | "security"
   | "ppt" | "logic" | "admin" | "phone" | "voice";
 
@@ -21,6 +21,8 @@ export interface Feature {
 export const FEATURES: Feature[] = [
   { key: "command-center", label: "Command Center", short: "Home", icon: LayoutDashboard, accent: "blue", description: "Your mission control hub." },
   { key: "stocks", label: "Live Markets", short: "Markets", icon: TrendingUp, accent: "blue", description: "Stocks, crypto & trending tickers." },
+  { key: "money", label: "Money & Metals", short: "Money", icon: Banknote, accent: "blue", description: "Forex (INR), gold & silver live." },
+  { key: "transport", label: "Transport Live", short: "Transport", icon: Navigation, accent: "blue", description: "Flights, trains, traffic — real time." },
   { key: "news", label: "Live News", short: "News", icon: Newspaper, accent: "blue", description: "Global, tech, business & AI feeds." },
   { key: "sports", label: "Live Scores", short: "Sports", icon: Trophy, accent: "blue", description: "Cricket, football & more — real-time." },
   { key: "weather", label: "Weather + AQI", short: "Weather", icon: CloudSun, accent: "blue", description: "Live weather, air quality & forecast." },
