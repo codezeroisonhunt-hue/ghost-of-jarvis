@@ -117,8 +117,10 @@ serve(async (req) => {
 
     throw new Error(`Unknown action: ${action}`);
   } catch (e) {
-    return new Response(JSON.stringify({ error: String((e as Error).message || e) }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    const msg = String((e as Error).message || e);
+    const notFound = /not found/i.test(msg);
+    return new Response(JSON.stringify({ error: msg, fallback: notFound }), {
+      status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
