@@ -2,3 +2,6 @@ project_id = "igtdohydwjscuwhewqlh"
 
 [functions.news]
 verify_jwt = false
+
+[functions.sports]
+verify_jwt = false

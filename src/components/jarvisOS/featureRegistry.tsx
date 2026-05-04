@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, TrendingUp, Newspaper, Search, Briefcase, Link2, Atom,
   ShoppingBag, HeartPulse, Users, BrainCircuit, FlaskConical, ShieldAlert,
-  Presentation, Cpu, Settings2, Smartphone, Mic, LucideIcon,
+  Presentation, Cpu, Settings2, Smartphone, Mic, Trophy, LucideIcon,
 } from "lucide-react";
 
 export type FeatureKey =
