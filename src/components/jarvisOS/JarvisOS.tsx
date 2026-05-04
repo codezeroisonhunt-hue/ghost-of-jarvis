@@ -61,6 +61,8 @@ export default function JarvisOS() {
             <TradeAdvisorModule />
           ) : active === "news" ? (
             <NewsModule />
+          ) : active === "sports" ? (
+            <SportsModule />
           ) : (
             <ModulePlaceholder feature={feature} />
           )}
