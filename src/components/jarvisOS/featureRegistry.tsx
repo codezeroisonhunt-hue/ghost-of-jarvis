@@ -1,11 +1,11 @@
 import {
   LayoutDashboard, TrendingUp, Newspaper, Search, Briefcase, Link2, Atom,
   ShoppingBag, HeartPulse, Users, BrainCircuit, FlaskConical, ShieldAlert,
-  Presentation, Cpu, Settings2, Smartphone, Mic, LucideIcon,
+  Presentation, Cpu, Settings2, Smartphone, Mic, Trophy, LucideIcon,
 } from "lucide-react";
 
 export type FeatureKey =
-  | "command-center" | "stocks" | "news" | "search" | "business" | "links"
+  | "command-center" | "stocks" | "news" | "sports" | "search" | "business" | "links"
   | "atomic" | "trade" | "health" | "users" | "memory" | "lab" | "security"
   | "ppt" | "logic" | "admin" | "phone" | "voice";
 
@@ -22,6 +22,7 @@ export const FEATURES: Feature[] = [
   { key: "command-center", label: "Command Center", short: "Home", icon: LayoutDashboard, accent: "blue", description: "Your mission control hub." },
   { key: "stocks", label: "Live Markets", short: "Markets", icon: TrendingUp, accent: "blue", description: "Stocks, crypto & trending tickers." },
   { key: "news", label: "Live News", short: "News", icon: Newspaper, accent: "blue", description: "Global, tech, business & AI feeds." },
+  { key: "sports", label: "Live Scores", short: "Sports", icon: Trophy, accent: "blue", description: "Cricket, football & more — real-time." },
   { key: "search", label: "Smart Search", short: "Search", icon: Search, accent: "blue", description: "Google-linked intelligent search." },
   { key: "business", label: "Business Suite", short: "CRM", icon: Briefcase, accent: "blue", description: "Leads, clients, invoices, analytics." },
   { key: "links", label: "Link Auto-Driver", short: "Links", icon: Link2, accent: "blue", description: "Detect & classify URLs safely." },
