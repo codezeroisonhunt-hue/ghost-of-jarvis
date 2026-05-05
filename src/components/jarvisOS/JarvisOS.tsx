@@ -13,6 +13,7 @@ import SportsModule from "./modules/SportsModule";
 import WeatherModule from "./modules/WeatherModule";
 import TransportModule from "./modules/TransportModule";
 import MoneyModule from "./modules/MoneyModule";
+import EarthPulseModule from "./modules/EarthPulseModule";
 
 export default function JarvisOS() {
   const [active, setActive] = useState<FeatureKey>("command-center");
@@ -72,6 +73,8 @@ export default function JarvisOS() {
             <TransportModule />
           ) : active === "money" ? (
             <MoneyModule />
+          ) : active === "earth" ? (
+            <EarthPulseModule />
           ) : (
             <ModulePlaceholder feature={feature} />
           )}
