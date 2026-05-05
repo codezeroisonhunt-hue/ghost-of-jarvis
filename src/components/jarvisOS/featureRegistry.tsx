@@ -26,6 +26,7 @@ export const FEATURES: Feature[] = [
   { key: "news", label: "Live News", short: "News", icon: Newspaper, accent: "blue", description: "Global, tech, business & AI feeds." },
   { key: "sports", label: "Live Scores", short: "Sports", icon: Trophy, accent: "blue", description: "Cricket, football & more — real-time." },
   { key: "weather", label: "Weather + AQI", short: "Weather", icon: CloudSun, accent: "blue", description: "Live weather, air quality & forecast." },
+  { key: "earth", label: "Earth Pulse", short: "Earth", icon: Globe2, accent: "red", description: "Quakes, ISS tracker & launches." },
   { key: "search", label: "Smart Search", short: "Search", icon: Search, accent: "blue", description: "Google-linked intelligent search." },
   { key: "business", label: "Business Suite", short: "CRM", icon: Briefcase, accent: "blue", description: "Leads, clients, invoices, analytics." },
   { key: "links", label: "Link Auto-Driver", short: "Links", icon: Link2, accent: "blue", description: "Detect & classify URLs safely." },
