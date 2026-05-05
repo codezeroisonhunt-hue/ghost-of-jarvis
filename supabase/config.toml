@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.money]
 verify_jwt = false
+
+[functions.earth-pulse]
+verify_jwt = false
