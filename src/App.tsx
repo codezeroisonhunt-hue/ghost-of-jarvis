@@ -38,6 +38,7 @@ function App() {
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
+                  <Route path="/connect" element={<ProtectedRoute><AgentConnection /></ProtectedRoute>} />
                   <Route path="/startup" element={<Startup />} />
                   <Route path="/dashboard" element={
                     <ProtectedRoute>
