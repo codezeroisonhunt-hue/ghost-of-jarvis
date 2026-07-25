@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import path from 'path'
 import react from '@vitejs/plugin-react'
+import { mcpPlugin } from '@lovable.dev/mcp-js/stacks/supabase/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -20,6 +21,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
+      mcpPlugin(),
       mode === 'development' && componentTaggerPlugin,
     ].filter(Boolean),
     resolve: {
