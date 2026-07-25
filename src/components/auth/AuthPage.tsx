@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,12 +17,15 @@ const AuthPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('signin');
   const { user, signIn, signUp } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const rawNext = searchParams.get('next');
+  const nextPath = rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/dashboard';
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate(nextPath);
     }
-  }, [user, navigate]);
+  }, [user, navigate, nextPath]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
