@@ -23,6 +23,7 @@ import JarvisModeSwitcher from "./components/JarvisModeSwitcher";
 import JarvisV2Interface from "./pages/JarvisV2Interface";
 import JarvisOS from "./components/jarvisOS/JarvisOS";
 import OAuthConsent from "./pages/OAuthConsent";
+import AgentConnection from "./pages/AgentConnection";
 
 
 function App() {
