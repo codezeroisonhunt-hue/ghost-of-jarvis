@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://uswgppmnvxgjptzgqsoq.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "jarvis-mcp",
+      "version": "0.1.0",
+      "title": "JARVIS"
+    },
+    "tools": [
+      {
+        "name": "echo",
+        "title": "Echo",
+        "description": "Echo back the given text. Useful to verify MCP connectivity.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Text to echo back."
+            }
+          },
+          "required": [
+            "text"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_my_profile",
+        "title": "Get my JARVIS profile",
+        "description": "Return the signed-in user's JARVIS profile (display name, avatar, timestamps).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_my_profile",
+        "title": "Update my JARVIS profile",
+        "description": "Update the signed-in user's display name and/or avatar URL on their JARVIS profile.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "display_name": {
+              "description": "New display name.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "avatar_url": {
+              "description": "New avatar image URL.",
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
