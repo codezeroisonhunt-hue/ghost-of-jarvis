@@ -23,6 +23,7 @@ import JarvisModeSwitcher from "./components/JarvisModeSwitcher";
 import JarvisV2Interface from "./pages/JarvisV2Interface";
 import JarvisOS from "./components/jarvisOS/JarvisOS";
 import OAuthConsent from "./pages/OAuthConsent";
+import AgentConnection from "./pages/AgentConnection";
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
+                  <Route path="/connect" element={<ProtectedRoute><AgentConnection /></ProtectedRoute>} />
                   <Route path="/startup" element={<Startup />} />
                   <Route path="/dashboard" element={
                     <ProtectedRoute>

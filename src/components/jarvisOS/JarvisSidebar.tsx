@@ -1,7 +1,8 @@
 import React from "react";
 import { FEATURES, FeatureKey } from "./featureRegistry";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, Zap } from "lucide-react";
+import { ChevronLeft, Plug, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   active: FeatureKey;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function JarvisSidebar({ active, onSelect, collapsed, onToggle, onClose, mobile }: Props) {
+  const navigate = useNavigate();
   return (
     <aside
       className={cn(
@@ -65,8 +67,17 @@ export default function JarvisSidebar({ active, onSelect, collapsed, onToggle, o
       </nav>
 
       {(!collapsed || mobile) && (
-        <div className="p-3 border-t border-primary/20 text-[10px] text-muted-foreground tracking-widest">
-          v2.0 • SECURE LINK
+        <div className="p-3 border-t border-primary/20 space-y-2">
+          <button
+            onClick={() => { navigate("/connect"); onClose?.(); }}
+            className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+          >
+            <Plug className="h-3.5 w-3.5" />
+            Agent Connect
+          </button>
+          <div className="text-[10px] text-muted-foreground tracking-widest">
+            v2.0 • SECURE LINK
+          </div>
         </div>
       )}
     </aside>
