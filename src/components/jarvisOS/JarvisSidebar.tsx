@@ -14,6 +14,7 @@ interface Props {
 }
 
 export default function JarvisSidebar({ active, onSelect, collapsed, onToggle, onClose, mobile }: Props) {
+  const navigate = useNavigate();
   return (
     <aside
       className={cn(
