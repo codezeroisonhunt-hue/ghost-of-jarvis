@@ -43,7 +43,7 @@ const AuthPage: React.FC = () => {
         toast.success('Welcome back!', {
           description: 'Successfully signed in to JARVIS'
         });
-        navigate('/dashboard');
+        navigate(nextPath);
       }
     } catch (error: any) {
       toast.error('Authentication Error', {
