@@ -24,6 +24,20 @@ import JarvisV2Interface from "./pages/JarvisV2Interface";
 import JarvisOS from "./components/jarvisOS/JarvisOS";
 import OAuthConsent from "./pages/OAuthConsent";
 import AgentConnection from "./pages/AgentConnection";
+import SecurityLayout from "./pages/security/SecurityLayout";
+import SecurityDashboard from "./pages/security/Dashboard";
+import LiveCameras from "./pages/security/LiveCameras";
+import Cameras from "./pages/security/Cameras";
+import SecurityMap from "./pages/security/SecurityMap";
+import SecurityPeople from "./pages/security/People";
+import SecurityVehicles from "./pages/security/Vehicles";
+import SecurityAlerts from "./pages/security/Alerts";
+import SecurityEvents from "./pages/security/Events";
+import SecurityZones from "./pages/security/Zones";
+import SecurityAssistant from "./pages/security/Assistant";
+import SecurityReports from "./pages/security/Reports";
+import SecurityAuditLogs from "./pages/security/AuditLogs";
+import SecuritySettings from "./pages/security/Settings";
 
 
 function App() {
