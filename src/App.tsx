@@ -70,6 +70,21 @@ function App() {
                   <Route path="/features" element={<ProtectedRoute><FeaturesOverview /></ProtectedRoute>} />
                   <Route path="/satellite" element={<ProtectedRoute><SatelliteSurveillancePage /></ProtectedRoute>} />
                   <Route path="/osint" element={<ProtectedRoute><OSINTSearch /></ProtectedRoute>} />
+                  <Route path="/security" element={<ProtectedRoute><SecurityLayout /></ProtectedRoute>}>
+                    <Route index element={<SecurityDashboard />} />
+                    <Route path="live" element={<LiveCameras />} />
+                    <Route path="cameras" element={<Cameras />} />
+                    <Route path="map" element={<SecurityMap />} />
+                    <Route path="people" element={<SecurityPeople />} />
+                    <Route path="vehicles" element={<SecurityVehicles />} />
+                    <Route path="alerts" element={<SecurityAlerts />} />
+                    <Route path="events" element={<SecurityEvents />} />
+                    <Route path="zones" element={<SecurityZones />} />
+                    <Route path="assistant" element={<SecurityAssistant />} />
+                    <Route path="reports" element={<SecurityReports />} />
+                    <Route path="audit" element={<SecurityAuditLogs />} />
+                    <Route path="settings" element={<SecuritySettings />} />
+                  </Route>
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </JarvisModeEnhancer>

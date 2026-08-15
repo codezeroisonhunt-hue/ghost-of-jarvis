@@ -1,7 +1,7 @@
 import React from "react";
 import { FEATURES, FeatureKey } from "./featureRegistry";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, Plug, Zap } from "lucide-react";
+import { ChevronLeft, Plug, ShieldCheck, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
