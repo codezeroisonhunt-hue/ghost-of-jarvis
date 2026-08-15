@@ -24,6 +24,20 @@ import JarvisV2Interface from "./pages/JarvisV2Interface";
 import JarvisOS from "./components/jarvisOS/JarvisOS";
 import OAuthConsent from "./pages/OAuthConsent";
 import AgentConnection from "./pages/AgentConnection";
+import SecurityLayout from "./pages/security/SecurityLayout";
+import SecurityDashboard from "./pages/security/Dashboard";
+import LiveCameras from "./pages/security/LiveCameras";
+import Cameras from "./pages/security/Cameras";
+import SecurityMap from "./pages/security/SecurityMap";
+import SecurityPeople from "./pages/security/People";
+import SecurityVehicles from "./pages/security/Vehicles";
+import SecurityAlerts from "./pages/security/Alerts";
+import SecurityEvents from "./pages/security/Events";
+import SecurityZones from "./pages/security/Zones";
+import SecurityAssistant from "./pages/security/Assistant";
+import SecurityReports from "./pages/security/Reports";
+import SecurityAuditLogs from "./pages/security/AuditLogs";
+import SecuritySettings from "./pages/security/Settings";
 
 
 function App() {
@@ -56,6 +70,21 @@ function App() {
                   <Route path="/features" element={<ProtectedRoute><FeaturesOverview /></ProtectedRoute>} />
                   <Route path="/satellite" element={<ProtectedRoute><SatelliteSurveillancePage /></ProtectedRoute>} />
                   <Route path="/osint" element={<ProtectedRoute><OSINTSearch /></ProtectedRoute>} />
+                  <Route path="/security" element={<ProtectedRoute><SecurityLayout /></ProtectedRoute>}>
+                    <Route index element={<SecurityDashboard />} />
+                    <Route path="live" element={<LiveCameras />} />
+                    <Route path="cameras" element={<Cameras />} />
+                    <Route path="map" element={<SecurityMap />} />
+                    <Route path="people" element={<SecurityPeople />} />
+                    <Route path="vehicles" element={<SecurityVehicles />} />
+                    <Route path="alerts" element={<SecurityAlerts />} />
+                    <Route path="events" element={<SecurityEvents />} />
+                    <Route path="zones" element={<SecurityZones />} />
+                    <Route path="assistant" element={<SecurityAssistant />} />
+                    <Route path="reports" element={<SecurityReports />} />
+                    <Route path="audit" element={<SecurityAuditLogs />} />
+                    <Route path="settings" element={<SecuritySettings />} />
+                  </Route>
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </JarvisModeEnhancer>

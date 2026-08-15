@@ -14,6 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      authorized_people: {
+        Row: {
+          active: boolean
+          created_by: string | null
+          enrolled_at: string
+          id: string
+          internal_id: string
+          is_demo: boolean
+          name: string
+          organization: string | null
+          permission_level: string
+          photo_url: string | null
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_by?: string | null
+          enrolled_at?: string
+          id?: string
+          internal_id: string
+          is_demo?: boolean
+          name: string
+          organization?: string | null
+          permission_level?: string
+          photo_url?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_by?: string | null
+          enrolled_at?: string
+          id?: string
+          internal_id?: string
+          is_demo?: boolean
+          name?: string
+          organization?: string | null
+          permission_level?: string
+          photo_url?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      camera_credentials: {
+        Row: {
+          camera_id: string
+          notes: string | null
+          password_encrypted: string | null
+          rtsp_url: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          camera_id: string
+          notes?: string | null
+          password_encrypted?: string | null
+          rtsp_url?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          camera_id?: string
+          notes?: string | null
+          password_encrypted?: string | null
+          rtsp_url?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "camera_credentials_camera_id_fkey"
+            columns: ["camera_id"]
+            isOneToOne: true
+            referencedRelation: "security_cameras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -41,15 +154,270 @@ export type Database = {
         }
         Relationships: []
       }
+      security_alerts: {
+        Row: {
+          acknowledged: boolean
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          event_id: string | null
+          id: string
+          is_demo: boolean
+          message: string
+          severity: string
+          title: string
+        }
+        Insert: {
+          acknowledged?: boolean
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          is_demo?: boolean
+          message: string
+          severity?: string
+          title: string
+        }
+        Update: {
+          acknowledged?: boolean
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          is_demo?: boolean
+          message?: string
+          severity?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_alerts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "security_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_cameras: {
+        Row: {
+          camera_code: string
+          camera_type: string
+          created_at: string
+          created_by: string | null
+          field_of_view: number | null
+          id: string
+          is_demo: boolean
+          last_heartbeat: string | null
+          latitude: number | null
+          location: string
+          longitude: number | null
+          name: string
+          preview_url: string | null
+          recording: boolean
+          status: string
+          stream_url: string | null
+          updated_at: string
+          zone_id: string | null
+        }
+        Insert: {
+          camera_code: string
+          camera_type?: string
+          created_at?: string
+          created_by?: string | null
+          field_of_view?: number | null
+          id?: string
+          is_demo?: boolean
+          last_heartbeat?: string | null
+          latitude?: number | null
+          location: string
+          longitude?: number | null
+          name: string
+          preview_url?: string | null
+          recording?: boolean
+          status?: string
+          stream_url?: string | null
+          updated_at?: string
+          zone_id?: string | null
+        }
+        Update: {
+          camera_code?: string
+          camera_type?: string
+          created_at?: string
+          created_by?: string | null
+          field_of_view?: number | null
+          id?: string
+          is_demo?: boolean
+          last_heartbeat?: string | null
+          latitude?: number | null
+          location?: string
+          longitude?: number | null
+          name?: string
+          preview_url?: string | null
+          recording?: boolean
+          status?: string
+          stream_url?: string | null
+          updated_at?: string
+          zone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_cameras_zone_fk"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "security_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_events: {
+        Row: {
+          camera_id: string | null
+          confidence: number | null
+          created_at: string
+          details: Json | null
+          event_type: string
+          id: string
+          is_demo: boolean
+          occurred_at: string
+          person_id: string | null
+          severity: string
+          snapshot_url: string | null
+          zone_id: string | null
+        }
+        Insert: {
+          camera_id?: string | null
+          confidence?: number | null
+          created_at?: string
+          details?: Json | null
+          event_type: string
+          id?: string
+          is_demo?: boolean
+          occurred_at?: string
+          person_id?: string | null
+          severity?: string
+          snapshot_url?: string | null
+          zone_id?: string | null
+        }
+        Update: {
+          camera_id?: string | null
+          confidence?: number | null
+          created_at?: string
+          details?: Json | null
+          event_type?: string
+          id?: string
+          is_demo?: boolean
+          occurred_at?: string
+          person_id?: string | null
+          severity?: string
+          snapshot_url?: string | null
+          zone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_events_camera_id_fkey"
+            columns: ["camera_id"]
+            isOneToOne: false
+            referencedRelation: "security_cameras"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "security_events_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "authorized_people"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "security_events_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "security_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_zones: {
+        Row: {
+          color: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_demo: boolean
+          name: string
+          polygon: Json | null
+          rules: Json | null
+          updated_at: string
+          zone_type: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_demo?: boolean
+          name: string
+          polygon?: Json | null
+          rules?: Json | null
+          updated_at?: string
+          zone_type?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_demo?: boolean
+          name?: string
+          polygon?: Json | null
+          rules?: Json | null
+          updated_at?: string
+          zone_type?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_admin_if_first: { Args: never; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "operator" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -176,6 +544,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "operator", "viewer"],
+    },
   },
 } as const
