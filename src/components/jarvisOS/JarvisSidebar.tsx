@@ -1,7 +1,7 @@
 import React from "react";
 import { FEATURES, FeatureKey } from "./featureRegistry";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, Plug, ShieldCheck, Zap } from "lucide-react";
+import { ChevronLeft, GraduationCap, Plug, ShieldCheck, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -74,6 +74,13 @@ export default function JarvisSidebar({ active, onSelect, collapsed, onToggle, o
           >
             <ShieldCheck className="h-3.5 w-3.5" />
             Security Intelligence
+          </button>
+          <button
+            onClick={() => { navigate("/js-center"); onClose?.(); }}
+            className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+          >
+            <GraduationCap className="h-3.5 w-3.5" />
+            JS Center — Science Mentor
           </button>
           <button
             onClick={() => { navigate("/connect"); onClose?.(); }}

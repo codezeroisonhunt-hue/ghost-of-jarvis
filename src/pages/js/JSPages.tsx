@@ -105,9 +105,9 @@ export function JSProjectDetail() {
       await supabase.from("js_saved_projects").delete().eq("project_id", project.id).eq("user_id", u.user.id);
       setSaved(false);
     } else {
-      await supabase.from("js_saved_projects").insert({
+      await supabase.from("js_saved_projects").insert([{
         user_id: u.user.id, project_id: project.id, title: project.title, meta: project as unknown as Record<string, unknown>,
-      });
+      }]);
       setSaved(true);
     }
   };
@@ -278,10 +278,10 @@ export function JSDataLab() {
   const save = async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) { setStatus("Sign in to save experiments."); return; }
-    const { error } = await supabase.from("js_experiments").insert({
+    const { error } = await supabase.from("js_experiments").insert([{
       user_id: u.user.id, title: title || "Untitled experiment",
       independent_var: iv, dependent_var: dv, rows: rows as unknown as Record<string, unknown>[],
-    });
+    }]);
     setStatus(error ? error.message : "Experiment data saved.");
   };
 
