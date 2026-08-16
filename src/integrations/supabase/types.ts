@@ -127,6 +127,135 @@ export type Database = {
           },
         ]
       }
+      js_experiments: {
+        Row: {
+          controlled_vars: string | null
+          created_at: string
+          dependent_var: string | null
+          id: string
+          independent_var: string | null
+          project_id: string | null
+          rows: Json
+          title: string
+          user_id: string
+        }
+        Insert: {
+          controlled_vars?: string | null
+          created_at?: string
+          dependent_var?: string | null
+          id?: string
+          independent_var?: string | null
+          project_id?: string | null
+          rows?: Json
+          title: string
+          user_id: string
+        }
+        Update: {
+          controlled_vars?: string | null
+          created_at?: string
+          dependent_var?: string | null
+          id?: string
+          independent_var?: string | null
+          project_id?: string | null
+          rows?: Json
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      js_profiles: {
+        Row: {
+          budget: string | null
+          class_level: string | null
+          competition_level: string | null
+          components: string | null
+          days_available: number | null
+          subjects: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget?: string | null
+          class_level?: string | null
+          competition_level?: string | null
+          components?: string | null
+          days_available?: number | null
+          subjects?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget?: string | null
+          class_level?: string | null
+          competition_level?: string | null
+          components?: string | null
+          days_available?: number | null
+          subjects?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      js_project_docs: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          project_id: string
+          section: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          project_id: string
+          section: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          project_id?: string
+          section?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      js_saved_projects: {
+        Row: {
+          created_at: string
+          id: string
+          meta: Json
+          notes: string | null
+          progress: Json
+          project_id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meta?: Json
+          notes?: string | null
+          progress?: Json
+          project_id: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meta?: Json
+          notes?: string | null
+          progress?: Json
+          project_id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

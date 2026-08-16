@@ -38,6 +38,10 @@ import SecurityAssistant from "./pages/security/Assistant";
 import SecurityReports from "./pages/security/Reports";
 import SecurityAuditLogs from "./pages/security/AuditLogs";
 import SecuritySettings from "./pages/security/Settings";
+import JSLayout from "./pages/js/JSLayout";
+import JSHome from "./pages/js/JSHome";
+import JSProjectLab from "./pages/js/JSProjectLab";
+import { JSProjectDetail, JSBuild, JSBudget, JSDesigner, JSExperiment, JSKnowledge, JSJudge, JSDataLab, JSSaved } from "./pages/js/JSPages";
 
 
 function App() {
@@ -84,6 +88,19 @@ function App() {
                     <Route path="reports" element={<SecurityReports />} />
                     <Route path="audit" element={<SecurityAuditLogs />} />
                     <Route path="settings" element={<SecuritySettings />} />
+                  </Route>
+                  <Route path="/js-center" element={<ProtectedRoute><JSLayout /></ProtectedRoute>}>
+                    <Route index element={<JSHome />} />
+                    <Route path="lab" element={<JSProjectLab />} />
+                    <Route path="project/:id" element={<JSProjectDetail />} />
+                    <Route path="knowledge" element={<JSKnowledge />} />
+                    <Route path="build" element={<JSBuild />} />
+                    <Route path="experiment" element={<JSExperiment />} />
+                    <Route path="judge" element={<JSJudge />} />
+                    <Route path="budget" element={<JSBudget />} />
+                    <Route path="designer" element={<JSDesigner />} />
+                    <Route path="data" element={<JSDataLab />} />
+                    <Route path="saved" element={<JSSaved />} />
                   </Route>
                   <Route path="*" element={<NotFound />} />
                 </Routes>
