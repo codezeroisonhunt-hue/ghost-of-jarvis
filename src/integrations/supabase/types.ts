@@ -14,6 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_categories: {
+        Row: {
+          api_count: number
+          description: string | null
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          api_count?: number
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          api_count?: number
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      apis: {
+        Row: {
+          auth_type: string | null
+          category: string
+          cors: string
+          created_at: string
+          description: string
+          documentation_url: string
+          health_status: string | null
+          https: boolean | null
+          id: string
+          last_checked_at: string | null
+          last_synced_at: string
+          name: string
+          postman_available: boolean
+          slug: string
+          source_commit: string | null
+          source_repository: string
+          status: string
+          tags: string[]
+          updated_at: string
+        }
+        Insert: {
+          auth_type?: string | null
+          category: string
+          cors?: string
+          created_at?: string
+          description?: string
+          documentation_url: string
+          health_status?: string | null
+          https?: boolean | null
+          id?: string
+          last_checked_at?: string | null
+          last_synced_at?: string
+          name: string
+          postman_available?: boolean
+          slug: string
+          source_commit?: string | null
+          source_repository?: string
+          status?: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Update: {
+          auth_type?: string | null
+          category?: string
+          cors?: string
+          created_at?: string
+          description?: string
+          documentation_url?: string
+          health_status?: string | null
+          https?: boolean | null
+          id?: string
+          last_checked_at?: string | null
+          last_synced_at?: string
+          name?: string
+          postman_available?: boolean
+          slug?: string
+          source_commit?: string | null
+          source_repository?: string
+          status?: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -123,6 +216,133 @@ export type Database = {
             columns: ["camera_id"]
             isOneToOne: true
             referencedRelation: "security_cameras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collection_apis: {
+        Row: {
+          api_id: string
+          collection_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          api_id: string
+          collection_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          api_id?: string
+          collection_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_apis_api_id_fkey"
+            columns: ["api_id"]
+            isOneToOne: false
+            referencedRelation: "apis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_apis_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collections: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          api_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          api_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          api_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_api_id_fkey"
+            columns: ["api_id"]
+            isOneToOne: false
+            referencedRelation: "apis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_checks: {
+        Row: {
+          api_id: string
+          checked_at: string
+          duration_ms: number | null
+          http_status: number | null
+          id: string
+          status: string
+        }
+        Insert: {
+          api_id: string
+          checked_at?: string
+          duration_ms?: number | null
+          http_status?: number | null
+          id?: string
+          status: string
+        }
+        Update: {
+          api_id?: string
+          checked_at?: string
+          duration_ms?: number | null
+          http_status?: number | null
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_checks_api_id_fkey"
+            columns: ["api_id"]
+            isOneToOne: false
+            referencedRelation: "apis"
             referencedColumns: ["id"]
           },
         ]
@@ -282,6 +502,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      request_history: {
+        Row: {
+          api_id: string | null
+          api_name: string | null
+          created_at: string
+          duration_ms: number | null
+          id: string
+          method: string
+          status_code: number | null
+          url: string
+          user_id: string
+        }
+        Insert: {
+          api_id?: string | null
+          api_name?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          method: string
+          status_code?: number | null
+          url: string
+          user_id: string
+        }
+        Update: {
+          api_id?: string | null
+          api_name?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          method?: string
+          status_code?: number | null
+          url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_history_api_id_fkey"
+            columns: ["api_id"]
+            isOneToOne: false
+            referencedRelation: "apis"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       security_alerts: {
         Row: {
@@ -507,6 +771,48 @@ export type Database = {
           rules?: Json | null
           updated_at?: string
           zone_type?: string
+        }
+        Relationships: []
+      }
+      sync_runs: {
+        Row: {
+          added: number
+          api_count: number
+          category_count: number
+          created_at: string
+          id: string
+          message: string | null
+          removed: number
+          repository_commit: string | null
+          started_by: string | null
+          status: string
+          updated: number
+        }
+        Insert: {
+          added?: number
+          api_count?: number
+          category_count?: number
+          created_at?: string
+          id?: string
+          message?: string | null
+          removed?: number
+          repository_commit?: string | null
+          started_by?: string | null
+          status?: string
+          updated?: number
+        }
+        Update: {
+          added?: number
+          api_count?: number
+          category_count?: number
+          created_at?: string
+          id?: string
+          message?: string | null
+          removed?: number
+          repository_commit?: string | null
+          started_by?: string | null
+          status?: string
+          updated?: number
         }
         Relationships: []
       }
