@@ -6,6 +6,7 @@ import { getProject, PROJECTS } from "@/lib/jscenter/projects";
 import { CLASS_LABELS, DIFFICULTY_META } from "@/lib/jscenter/types";
 import { useJSProfile } from "@/hooks/useJSProfile";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { Star, RefreshCw, Hammer, Mic2, Wallet, Ruler, Beaker, BookOpen, BarChart3, Trash2 } from "lucide-react";
 
 /* ---------------- shared generator ---------------- */
@@ -106,7 +107,7 @@ export function JSProjectDetail() {
       setSaved(false);
     } else {
       await supabase.from("js_saved_projects").insert([{
-        user_id: u.user.id, project_id: project.id, title: project.title, meta: project as unknown as Record<string, unknown>,
+        user_id: u.user.id, project_id: project.id, title: project.title, meta: project as unknown as Json,
       }]);
       setSaved(true);
     }
@@ -280,7 +281,7 @@ export function JSDataLab() {
     if (!u.user) { setStatus("Sign in to save experiments."); return; }
     const { error } = await supabase.from("js_experiments").insert([{
       user_id: u.user.id, title: title || "Untitled experiment",
-      independent_var: iv, dependent_var: dv, rows: rows as unknown as Record<string, unknown>[],
+      independent_var: iv, dependent_var: dv, rows: rows as unknown as Json,
     }]);
     setStatus(error ? error.message : "Experiment data saved.");
   };
