@@ -6,6 +6,7 @@ import { getProject, PROJECTS } from "@/lib/jscenter/projects";
 import { CLASS_LABELS, DIFFICULTY_META } from "@/lib/jscenter/types";
 import { useJSProfile } from "@/hooks/useJSProfile";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { Star, RefreshCw, Hammer, Mic2, Wallet, Ruler, Beaker, BookOpen, BarChart3, Trash2 } from "lucide-react";
 
 /* ---------------- shared generator ---------------- */
